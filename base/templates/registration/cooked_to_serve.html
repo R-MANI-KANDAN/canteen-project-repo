@@ -31,14 +31,6 @@
     </div>
 
 
-    <!-- Sidebar Navigation -->
-    <nav class="sidebar" id="sidebar">
-        <a href="#">Home</a>
-        <a href="#">Menu</a>
-        <a href="#">Cart</a>
-        <a href="#">Contact</a>
-    </nav>
-
     <!-- Header Section -->
     <div class="header-logo">
         <img src="Images/Ready-To-Grab/licet_logo.png" alt="LICET Cafeteria Logo">
@@ -48,7 +40,7 @@
     <!-- Added Beverage Menu Heading -->
     <h1 class="menu-heading">Cooked to Serve</h1>
     <p class="menu-heading">Freshly made, just the way you crave!</p>
-
+  
     <div class="container">
         <!-- Veg Fried Rice & Noodles -->
         <section class="category-section hot-beverages">
@@ -61,7 +53,7 @@
                     <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
                     <h3>{{ product.name }}</h3>
                     <div class="price-tag">₹{{ product.price}}</div>
-                    <button class="order-btn">Add to Cart</button>
+                    <button class="add-cart order-btn" value = "{{ product.id }" }>Add to Cart</button>
                 </div>
                 {% endif %}
             {% endfor %}
@@ -79,7 +71,7 @@
                     <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
                     <h3>{{ product.name }}</h3>
                     <div class="price-tag">₹{{ product.price}}</div>
-                    <button class="order-btn">Add to Cart</button>
+                    <button class="add-cart order-btn">Add to Cart</button>
                 </div>
                 {% endif %}
             {% endfor %}
@@ -99,7 +91,7 @@
                     <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
                     <h3>{{ product.name }}</h3>
                     <div class="price-tag">₹{{ product.price}}</div>
-                    <button class="order-btn">Add to Cart</button>
+                    <button class="add-cart order-btn">Add to Cart</button>
                 </div>
                 {% endif %}
             {% endfor %}   
@@ -135,52 +127,75 @@
 
   // ---------------- CART SYSTEM ----------------
 
-  const cartElement = document.getElementById('cart-count');
 
-  function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
-    const total = cart.reduce((sum, item) => sum + item.qty, 0);
-    cartElement.textContent = total;
-  }
 
-  function addToCart(item) {
-    let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
 
-    const existingIndex = cart.findIndex(i => i.name === item.name);
-    if (existingIndex !== -1) {
-      cart[existingIndex].qty += 1;
-    } else {
-      cart.push({ ...item, qty: 1 });
-    }
-
-    localStorage.setItem('cartItems', JSON.stringify(cart));
-    updateCartCount();
-  }
-
-  // Attach to all buttons
-  document.querySelectorAll('.order-btn').forEach(button => {
-    button.addEventListener('click', () => {
-      const card = button.closest('.beverage-card');
-      const name = card.querySelector('h3').textContent;
-      const price = parseInt(card.querySelector('.price-tag').textContent.replace('₹', ''));
-      const img = card.querySelector('img').src;
-
-      addToCart({ name, price, img });
+ 
+ $(document).on('click', '.cart-add', function(e) {
+    e.preventDefault();
+    $.ajax({
+      type: 'POST',
+      url: '{% url "cart_add" %}',
+      data: {
+        product_id: $(this).val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        action: 'post'
+      },
+      success: function(json) {
+        console.log(json);
+      },
+      error: function(xhr, errmsg, err) {
+        console.log(xhr.status + ": " + xhr.responseText);
+      }
     });
   });
+  
+//   const cartElement = document.getElementById('cart-count');
 
-  document.addEventListener('DOMContentLoaded', () => {
-    updateCartCount();
+//   function updateCartCount() {
+//     const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+//     const total = cart.reduce((sum, item) => sum + item.qty, 0);
+//     cartElement.textContent = total;
+//   }
 
-    const data = JSON.parse(localStorage.getItem('userData')) || {};
-    if (data.fullName) {
-      document.getElementById('profileName').textContent = data.fullName;
-    }
-    if (data.profilePic) {
-      document.getElementById('profilePic').src = data.profilePic;
-    }
-  });
-</script>
+//   function addToCart(item) {
+//     let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
 
-</body>
-</html>
+//     const existingIndex = cart.findIndex(i => i.name === item.name);
+//     if (existingIndex !== -1) {
+//       cart[existingIndex].qty += 1;
+//     } else {
+//       cart.push({ ...item, qty: 1 });
+//     }
+
+//     localStorage.setItem('cartItems', JSON.stringify(cart));
+//     updateCartCount();
+//   }
+
+//   // Attach to all buttons
+//   document.querySelectorAll('.order-btn').forEach(button => {
+//     button.addEventListener('click', () => {
+//       const card = button.closest('.beverage-card');
+//       const name = card.querySelector('h3').textContent;
+//       const price = parseInt(card.querySelector('.price-tag').textContent.replace('₹', ''));
+//       const img = card.querySelector('img').src;
+
+//       addToCart({ name, price, img });
+//     });
+//   });
+
+//   document.addEventListener('DOMContentLoaded', () => {
+//     updateCartCount();
+
+//     const data = JSON.parse(localStorage.getItem('userData')) || {};
+//     if (data.fullName) {
+//       document.getElementById('profileName').textContent = data.fullName;
+//     }
+//     if (data.profilePic) {
+//       document.getElementById('profilePic').src = data.profilePic;
+//     }
+//   });
+// </script>
+
+// </body>
+// </html>
