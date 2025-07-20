@@ -1,0 +1,245 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden; /* Prevent horizontal scrolling only */
+  }
+  
+  /* Full-Screen Background */
+  .fullscreen-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('fullscreen-bg1.jpg'); /* New background image */
+    background-size: cover;
+    background-position: center;
+    z-index: -1; /* Place behind everything */
+  }
+  
+  /* Logo and Title - Positioned at top left corner */
+  .logo-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 2;
+  }
+  
+  .logo {
+    width: 70px; /* Increased logo size */
+    height: auto;
+    filter: brightness(1.2); /* Make the logo more visible */
+  }
+  
+  .logo-container h1 {
+    font-size: 1.8rem; /* Slightly larger text */
+    color: #ffffff; /* White color for visibility on dark background */
+    margin: 0;
+    font-weight: 600; /* Bold text */
+  }
+  
+  /* GIF Panel - Left Side */
+  .gif-panel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #002b5c, #003f7f);
+    position: sticky;
+    top: 0;
+  }
+  
+  .gif-panel img {
+    width: 80%;
+    max-height: 90%;
+    object-fit: contain;
+  }
+  
+  /* Sign-Up Container - Right Side */
+  .signup-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    padding: 40px 40px 60px 40px; /* Extra bottom padding */
+    background-color: white;
+    min-height: 100vh;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+    overflow-y: auto; /* Enable vertical scrolling when needed */
+  }
+  
+  .signup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 500px;
+    width: 100%;
+    margin: auto; /* Center the content */
+    padding: 20px 0; /* Add some vertical padding */
+  }
+  
+  /* Styled Welcome Message */
+  .welcome-message {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.6rem;
+    text-align: center;
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #ffc107;
+    padding-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Sign-Up Form */
+  .signup-form {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 400px; /* Same width as login form */
+  }
+  
+  .signup-form h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+  }
+  
+  .signup-form input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+  
+  .signup-form input:focus {
+    outline: none;
+    border-color: #ffc107; /* Warm yellow color */
+  }
+  
+  .signup-form button {
+    width: 100%;
+    padding: 12px;
+    background-color: #ffc107; /* Warm yellow color */
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .signup-form button:hover {
+    background-color: #e0a800; /* Darker yellow on hover */
+  }
+  
+  /* Extra Login Button */
+  .login-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: transparent; /* Transparent background */
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px; /* Space above the button */
+  }
+  
+  .login-btn:hover {
+    background-color: #f4f4f9; /* Light gray on hover */
+  }
+  
+  /* Divider and Google Button */
+  .divider {
+    text-align: center;
+    margin: 20px 0;
+    color: #999;
+    position: relative;
+  }
+  
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: #ddd;
+    position: absolute;
+    top: 50%;
+    width: 45%;
+  }
+  
+  .divider::before {
+    left: 0;
+  }
+  
+  .divider::after {
+    right: 0;
+  }
+  
+  .google-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .google-btn:hover {
+    background-color: #f4f4f9;
+  }
+  
+  .google-btn img {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Link Styling */
+  .signup-link, .login-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #333;
+  }
+  
+  .signup-link a, .login-link a {
+    color: #ff6b6b; /* Warm red color */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .signup-link a:hover, .login-link a:hover {
+    color: #ff4c4c; /* Darker red on hover */
+  }
