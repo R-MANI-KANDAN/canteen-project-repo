@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LICET Canteen Cart</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
   <link rel="stylesheet" href="{% static 'accounts/cart_summary.css' %}" >
 </head>
 <body>
@@ -161,6 +161,7 @@
             <th>Price</th>
             <th>Quantity</th>
             <th>Subtotal</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
@@ -173,16 +174,38 @@
                 {{ product.name }}
               </td>
               <td>₹{{ product.price }}</td>
-              <td>{{ product.quantity }}</td>
+              <td>
+                <select class="form-select" aria-label="Default select example" id ="select{{ product.id }}" >
+                    {% for key,value in product_quantities %}
+                      {% if key == product.id|slugify %}
+                    <option selected>{{ value }}</option>
+                      {% endif %}
+                    {% endfor %}
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                 </select>
+              </td>
               <td>₹{{ product.price|floatformat:2|add:"0"|floatformat:2 }}</td>
+              <td> 
+                <button type ="button" class="update-cart" data-index="{{ product.id }}">Update</button>
+                <button class="remove-btn" >Remove</button>
+              </td>
             </tr>
+            {% empty %}
             {% endfor %}
           {% else %}
             <tr>
               <td colspan="4">Your cart is empty.</td>
             </tr>
           {% endif %}
-        </tbody>
       </table>
     </section>
   </main>
@@ -295,387 +318,211 @@
     </div>
   </footer>
 
-  <script>
-    // Toggle Sidebar
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('active');
-    }
-
-    // Close sidebar when clicking outside
-    document.addEventListener('click', function(event) {
-      const sidebar = document.getElementById('sidebar');
-      const hamburger = document.querySelector('.hamburger-menu');
-      
-      if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
-        sidebar.classList.remove('active');
-      }
-    });
-
-    $(document).ready(function() {
-    $('.increase-quantity').click(function(e) {
-        e.preventDefault();
-        var productId = $(this).data('product');
-        var quantityInput = $(`.quantity-input[data-product="${productId}"]`);
-        let currentQuantity = parseInt(quantityInput.val());
-        quantityInput.val(currentQuantity + 1);
-    });
-
-    $('.decrease-quantity').click(function(e) {
-        e.preventDefault();
-        var productId = $(this).data('product');
-        var quantityInput = $(`.quantity-input[data-product="${productId}"]`);
-        let currentQuantity = parseInt(quantityInput.val());
-        if (currentQuantity > 1) {
-            quantityInput.val(currentQuantity - 1);
-        }
-    });
-});
-
-
-    // Sample cart items
-    let items = JSON.parse(localStorage.getItem('cartItems')) || [];
-
-
-    let selectedTime = '12:45 PM';
-    let selectedType = 'Dine In';
-    let selectedDate = '';
-
-    // DOM elements
-    const cartBody = document.getElementById('cart-body');
-    const subtotalEl = document.getElementById('subtotal');
-    const discountEl = document.getElementById('discount');
-    const totalEl = document.getElementById('total');
-    const couponInput = document.getElementById('coupon');
-    const receiptTotal = document.getElementById('receipt-total');
-    const selectedDateEl = document.getElementById('selected-date');
-    const receiptItems = document.getElementById('receipt-items');
-
-    function renderCart() {
-      cartBody.innerHTML = '';
-      let subtotal = 0;
-
-      items.forEach((item, idx) => {
-        const row = document.createElement('tr');
-        const itemTotal = item.price * item.qty;
-        subtotal += itemTotal;
-
-        row.innerHTML = `
-          <td>
-            <div class="item-cell">
-              <img src="${item.img}" class="food-img" alt="${item.name}">
-              <span>${item.name}</span>
-            </div>
-          </td>
-          <td><strong>₹${item.price}</strong></td>
-          <td>
-            <input type="number" min="1" value="${item.qty}" data-idx="${idx}" class="qty-input">
-          </td>
-          <td><strong>₹<span class="subtotal">${itemTotal}</span></strong></td>
-        `;
-        cartBody.appendChild(row);
-      });
-
-      applyDiscount(subtotal);
-      updateReceiptItems();
-    }
-
-    function applyDiscount(subtotal) {
-      const code = couponInput.value.trim();
-      let discount = 0;
-      if (code.toUpperCase() === 'LICET5') {
-        discount = Math.round(subtotal * 0.05);
-      }
-      const total = subtotal - discount;
-
-      subtotalEl.textContent = subtotal;
-      discountEl.textContent = discount;
-      totalEl.textContent = total;
-      receiptTotal.textContent = total;
-      
-      // Update QR code with new total
-      generateQRCode();
-    }
-
-    function updateReceiptItems() {
-      const itemNames = items.map(item => `${item.name} (x${item.qty})`).join(', ');
-      receiptItems.textContent = itemNames;
-    }
-
-    function generateQRCode() {
-      const qrContainer = document.getElementById('qrcode');
-      qrContainer.innerHTML = ''; // Clear existing QR code
-      
-      const orderData = {
-        restaurant: 'LICET Cafeteria',
-        items: items.map(item => `${item.name} x${item.qty}`),
-        total: receiptTotal.textContent,
-        date: selectedDate || new Date().toISOString().split('T')[0],
-        time: selectedTime,
-        type: selectedType,
-        orderNumber: 'LCT-035'
-      };
-      
-      const qrText = `LICET Cafeteria Receipt\nOrder: ${orderData.items.join(', ')}\nDate: ${orderData.date} ${orderData.time}\nType: ${orderData.type}\nTotal: ₹${orderData.total}\nOrder #: ${orderData.orderNumber}`;
-      
-      try {
-        const qr = qrcode(0, 'M');
-        qr.addData(qrText);
-        qr.make();
-        qrContainer.innerHTML = qr.createImgTag(4, 8);
-      } catch (error) {
-        console.error('QR Code generation failed:', error);
-        qrContainer.innerHTML = '<div style="padding: 20px; background: #f0f0f0; border-radius: 8px; color: #666;">QR Code will be generated here</div>';
-      }
-    }
-
-    // Event listeners
-    cartBody.addEventListener('input', (e) => {
-      if (e.target.type === 'number') {
-        const idx = e.target.dataset.idx;
-        const newQty = parseInt(e.target.value);
-        if (newQty > 0) {
-          items[idx].qty = newQty;
-          renderCart();
-        }
-      }
-    });
-
-    couponInput.addEventListener('input', () => {
-      let subtotal = 0;
-      items.forEach(item => {
-        subtotal += item.price * item.qty;
-      });
-      applyDiscount(subtotal);
-    });
-
-    document.getElementById('order-date').addEventListener('change', function() {
-      selectedDate = this.value;
-      selectedDateEl.textContent = this.value || '--/--/----';
-      generateQRCode();
-    });
-
-    // Time slot selection
-    document.querySelectorAll('.option-btn[data-time]').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.option-btn[data-time]').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        selectedTime = this.dataset.time;
-        document.querySelector('.selected-time').textContent = selectedTime;
-        generateQRCode();
-      });
-    });
-
-    // Order type selection
-    document.querySelectorAll('.option-btn[data-type]').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.option-btn[data-type]').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        selectedType = this.dataset.type;
-        document.querySelector('.selected-type').textContent = selectedType;
-        generateQRCode();
-      });
-    });
-
-    // Payment method selection
-    document.querySelectorAll('.payment-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-      });
-    });
-
-    document.getElementById('download-receipt').addEventListener('click', () => {
-      const element = document.getElementById('receipt-content');
-      const opt = {
-        margin: 1,
-        filename: 'LICET_Receipt.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-      };
-      
-      html2pdf().set(opt).from(element).save().then(() => {
-        alert('Receipt downloaded successfully!');
-      });
-    });
-
-    // Initialize
-    renderCart();
-    
-    // Set initial date to today
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('order-date').value = today;
-    selectedDate = today;
-    selectedDateEl.textContent = today;
-
-    // Animate sections
-    const sections = document.querySelectorAll('section');
-    sections.forEach((section, index) => {
-      setTimeout(() => {
-        section.classList.add('active');
-      }, index * 200);
-    });
-
-    // Generate initial QR code
-    setTimeout(generateQRCode, 500);
-
-    // Hamburger Menu Toggle
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('active');
-    }
-
-    // User Dropdown Toggle
-    function toggleDropdown() {
-      const dropdown = document.getElementById('dropdownMenu');
-      dropdown.classList.toggle('active');
-    }
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-      const userSection = document.querySelector('.user-section');
-      const dropdown = document.getElementById('dropdownMenu');
-      
-      if (!userSection.contains(event.target)) {
-        dropdown.classList.remove('active');
-      }
-    });
-
-    // Profile Modal Functions
-    function openProfileModal() {
-      document.getElementById('profileModal').style.display = 'block';
-      document.getElementById('dropdownMenu').classList.remove('active');
-      
-      // Load existing data if available
-      loadProfileData();
-    }
-
-    function closeProfileModal() {
-      document.getElementById('profileModal').style.display = 'none';
-    }
-
-    function loadProfileData() {
-  const userData = JSON.parse(localStorage.getItem('userData')) || {};
-
-  document.getElementById('fullName').value = userData.fullName || '';
-  document.getElementById('yearOfStudy').value = userData.yearOfStudy || '';
-  document.getElementById('batch').value = userData.batch || '';
-  document.getElementById('department').value = userData.department || '';
-  document.getElementById('dateOfBirth').value = userData.dateOfBirth || '';
-
-  // Load profile picture
-  if (userData.profilePic) {
-    document.getElementById('profilePicPreview').src = userData.profilePic;
-    document.querySelector('.user-button img').src = userData.profilePic;
-  }
-
-  if (userData.fullName) {
-    document.getElementById('userName').textContent = userData.fullName;
-  }
-}
-
-
-    function handleProfilePicChange(event) {
-      const file = event.target.files[0];
-      if (file) {
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
-          alert('Please select a valid image file.');
-          return;
-        }
-        
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-          alert('Please select an image smaller than 5MB.');
-          return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const imageDataUrl = e.target.result;
-          document.getElementById('profilePicPreview').src = imageDataUrl;
-          
-          // Store the image data temporarily
-          window.tempProfilePic = imageDataUrl;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function removeProfilePic() {
-      // Reset to default profile picture
-      const defaultPic = 'Images/Landing Page/User-Logo.png';
-      document.getElementById('profilePicPreview').src = defaultPic;
-      document.getElementById('profilePicInput').value = '';
-      window.tempProfilePic = null;
-    }
-
-    function saveProfile() {
-      const formData = {
-        fullName: document.getElementById('fullName').value,
-        yearOfStudy: document.getElementById('yearOfStudy').value,
-        batch: document.getElementById('batch').value,
-        department: document.getElementById('department').value,
-        dateOfBirth: document.getElementById('dateOfBirth').value,
-        profilePic: window.tempProfilePic || window.userData?.profilePic || 'Images/Landing Page/User-Logo.png'
-      };
-
-      // Save to memory (in a real app, this would be sent to a server)
-      localStorage.setItem('userData', JSON.stringify(formData));
-
-      
-      // Update the display name
-      if (formData.fullName) {
-        document.getElementById('userName').textContent = formData.fullName;
-      }
-
-      // Update the user button profile picture
-      if (formData.profilePic) {
-        document.querySelector('.user-button img').src = formData.profilePic;
-      }
-
-      // Clear temporary profile pic data
-      window.tempProfilePic = null;
-
-      // Show success message
-      alert('Profile updated successfully!');
-      closeProfileModal();
-    }
-
-    function logout() {
-      const confirmLogout = confirm('Are you sure you want to logout?');
-      if (confirmLogout) {
-        // Clear user data
-        window.userData = {};
-        window.tempProfilePic = null;
-        
-        // In a real app, you would redirect to login page
-        alert('You have been logged out successfully!');
-        
-        // Reset display
-        document.getElementById('userName').textContent = 'User Name';
-        document.querySelector('.user-button img').src = 'Images/Landing Page/User-Logo.png';
-        document.getElementById('dropdownMenu').classList.remove('active');
-      }
-    }
-
-    // Close modal when clicking outside of it
-    window.onclick = function(event) {
-      const modal = document.getElementById('profileModal');
-      if (event.target === modal) {
-        closeProfileModal();
-      }
-    }
-
-    // Initialize user data storage
-    window.userData = window.userData || {};
-    document.addEventListener('DOMContentLoaded', () => {
-  loadProfileData();
-});
-
-localStorage.removeItem('cartItems');
-
-
-  </script>
 </body>
 </html>
+
+<script>
+$(document).on('click', '.update-cart', function(e) {
+    e.preventDefault();
+    var productId = $(this).data('index');
+
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'cart_update' %}",
+        data: {
+            product_id: $(this).data('index'),
+            product_quantity: $('#select' + productId + ' option:selected').text(),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            action: 'post'
+        },
+        success: function(json) {
+            // document.getElementById('cart_quantity').textContent = json.quantity;
+            // console.log('Item added to cart:', json);
+            console.log('Updated product id:', productId);
+            console.log('Updated quantity:', $('#select' + productId + ' option:selected').val());
+            location.reload();
+            // Update the cart quantity display   
+
+        },
+        error: function(xhr, errormsg, error) {
+            console.error('Error adding item to cart:', error);
+        }
+    });
+});
+
+//     // Toggle Sidebar
+//     function toggleSidebar() {
+//       document.getElementById('sidebar').classList.toggle('active');
+//     }
+
+//     // Close sidebar when clicking outside
+//     document.addEventListener('click', function(event) {
+//       const sidebar = document.getElementById('sidebar');
+//       const hamburger = document.querySelector('.hamburger-menu');
+      
+//       if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
+//         sidebar.classList.remove('active');
+//       }
+//     });
+
+   
+    
+//     // Hamburger Menu Toggle
+//     function toggleSidebar() {
+//       const sidebar = document.getElementById('sidebar');
+//       sidebar.classList.toggle('active');
+//     }
+
+//     // User Dropdown Toggle
+//     function toggleDropdown() {
+//       const dropdown = document.getElementById('dropdownMenu');
+//       dropdown.classList.toggle('active');
+//     }
+
+//     // Close dropdown when clicking outside
+//     document.addEventListener('click', function(event) {
+//       const userSection = document.querySelector('.user-section');
+//       const dropdown = document.getElementById('dropdownMenu');
+      
+//       if (!userSection.contains(event.target)) {
+//         dropdown.classList.remove('active');
+//       }
+//     });
+
+//     // Profile Modal Functions
+//     function openProfileModal() {
+//       document.getElementById('profileModal').style.display = 'block';
+//       document.getElementById('dropdownMenu').classList.remove('active');
+      
+//       // Load existing data if available
+//       loadProfileData();
+//     }
+
+//     function closeProfileModal() {
+//       document.getElementById('profileModal').style.display = 'none';
+//     }
+
+//     function loadProfileData() {
+//   const userData = JSON.parse(localStorage.getItem('userData')) || {};
+
+//   document.getElementById('fullName').value = userData.fullName || '';
+//   document.getElementById('yearOfStudy').value = userData.yearOfStudy || '';
+//   document.getElementById('batch').value = userData.batch || '';
+//   document.getElementById('department').value = userData.department || '';
+//   document.getElementById('dateOfBirth').value = userData.dateOfBirth || '';
+
+//   // Load profile picture
+//   if (userData.profilePic) {
+//     document.getElementById('profilePicPreview').src = userData.profilePic;
+//     document.querySelector('.user-button img').src = userData.profilePic;
+//   }
+
+//   if (userData.fullName) {
+//     document.getElementById('userName').textContent = userData.fullName;
+//   }
+// }
+
+
+//     function handleProfilePicChange(event) {
+//       const file = event.target.files[0];
+//       if (file) {
+//         // Validate file type
+//         if (!file.type.startsWith('image/')) {
+//           alert('Please select a valid image file.');
+//           return;
+//         }
+        
+//         // Validate file size (max 5MB)
+//         if (file.size > 5 * 1024 * 1024) {
+//           alert('Please select an image smaller than 5MB.');
+//           return;
+//         }
+        
+//         const reader = new FileReader();
+//         reader.onload = function(e) {
+//           const imageDataUrl = e.target.result;
+//           document.getElementById('profilePicPreview').src = imageDataUrl;
+          
+//           // Store the image data temporarily
+//           window.tempProfilePic = imageDataUrl;
+//         };
+//         reader.readAsDataURL(file);
+//       }
+//     }
+
+//     function removeProfilePic() {
+//       // Reset to default profile picture
+//       const defaultPic = 'Images/Landing Page/User-Logo.png';
+//       document.getElementById('profilePicPreview').src = defaultPic;
+//       document.getElementById('profilePicInput').value = '';
+//       window.tempProfilePic = null;
+//     }
+
+//     function saveProfile() {
+//       const formData = {
+//         fullName: document.getElementById('fullName').value,
+//         yearOfStudy: document.getElementById('yearOfStudy').value,
+//         batch: document.getElementById('batch').value,
+//         department: document.getElementById('department').value,
+//         dateOfBirth: document.getElementById('dateOfBirth').value,
+//         profilePic: window.tempProfilePic || window.userData?.profilePic || 'Images/Landing Page/User-Logo.png'
+//       };
+
+//       // Save to memory (in a real app, this would be sent to a server)
+//       localStorage.setItem('userData', JSON.stringify(formData));
+
+      
+//       // Update the display name
+//       if (formData.fullName) {
+//         document.getElementById('userName').textContent = formData.fullName;
+//       }
+
+//       // Update the user button profile picture
+//       if (formData.profilePic) {
+//         document.querySelector('.user-button img').src = formData.profilePic;
+//       }
+
+//       // Clear temporary profile pic data
+//       window.tempProfilePic = null;
+
+//       // Show success message
+//       alert('Profile updated successfully!');
+//       closeProfileModal();
+//     }
+
+//     function logout() {
+//       const confirmLogout = confirm('Are you sure you want to logout?');
+//       if (confirmLogout) {
+//         // Clear user data
+//         window.userData = {};
+//         window.tempProfilePic = null;
+        
+//         // In a real app, you would redirect to login page
+//         alert('You have been logged out successfully!');
+        
+//         // Reset display
+//         document.getElementById('userName').textContent = 'User Name';
+//         document.querySelector('.user-button img').src = 'Images/Landing Page/User-Logo.png';
+//         document.getElementById('dropdownMenu').classList.remove('active');
+//       }
+//     }
+
+//     // Close modal when clicking outside of it
+//     window.onclick = function(event) {
+//       const modal = document.getElementById('profileModal');
+//       if (event.target === modal) {
+//         closeProfileModal();
+//       }
+//     }
+
+//     // Initialize user data storage
+//     window.userData = window.userData || {};
+//     document.addEventListener('DOMContentLoaded', () => {
+//   loadProfileData();
+// });
+
+// localStorage.removeItem('cartItems');
+
+
+//   
+</script>

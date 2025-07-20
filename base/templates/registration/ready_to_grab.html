@@ -53,15 +53,15 @@
                     <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
                     <h3>{{ product.name }}</h3>
                     <div class="price-tag">₹{{ product.price}}</div>
-                    <button  class="add-cart order-btn" data-product="{{ product.id }}">Add to Cart</button>
-                    <button class = "increase-quantity" data-product="{{ product.id }}">+</button>
-                    <input type="number" class="quantity-input" value="1" min="1" data-product="{{ product.id }}" style="width: 50px; margin-left: 10px;">
-                    <button class = "decrease-quantity" data-product="{{ product.id }}">-</button>
+                    <button class="add-cart order-btn" data-product="{{ product.id }}">Add to Cart</button>
+                    <select class="qty-cart form-select"  aria-label="Default select example" style="display:none;" >
+                        <option selected value="1">1</option>
+                    </select>
                 </div>
                 {% endif %}
               {% endfor %}
             </div>
-        </section>
+        </section>  
     <div class="container">
         <!-- Non-Veg -->
         <section class="category-section cold-beverages">
@@ -95,20 +95,22 @@
     </div>
   </footer>
 
-  
+</body>
+
+
+
+
 <script>
 $(document).on('click', '.add-cart', function(e) {
     e.preventDefault();
     const productId = $(this).data('product');
     // Get the quantity from the input field for this product
-    var quantity = $(`.quantity-input[data-product="${productId}"]`).val() || 1;
-
     $.ajax({
         type: 'POST',
         url : '{% url "cart_add" %}',
         data: {
             product_id: productId,
-            product_quantity: quantity,
+            product_quantity: $(this).closest('.beverage-card').find('.qty-cart').text(),
             csrfmiddlewaretoken: '{{ csrf_token }}',
             action: 'post'
         },
@@ -119,26 +121,8 @@ $(document).on('click', '.add-cart', function(e) {
         error: function(xhr, errormsg, error) {
             console.error('Error adding item to cart:', error);
         }
-    });
-});
 
-$(document).ready(function() {
-    $('.increase-quantity').click(function(e) {
-        e.preventDefault();
-        var productId = $(this).data('product');
-        var quantityInput = $(`.quantity-input[data-product="${productId}"]`);
-        let currentQuantity = parseInt(quantityInput.val());
-        quantityInput.val(currentQuantity + 1);
-    });
 
-    $('.decrease-quantity').click(function(e) {
-        e.preventDefault();
-        var productId = $(this).data('product');
-        var quantityInput = $(`.quantity-input[data-product="${productId}"]`);
-        let currentQuantity = parseInt(quantityInput.val());
-        if (currentQuantity > 1) {
-            quantityInput.val(currentQuantity - 1);
-        }
     });
 });
 </script>

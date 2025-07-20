@@ -22,6 +22,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category , on_delete = models.CASCADE)
     image = models.ImageField(upload_to = 'uploads/product/')
     code_no = models.IntegerField(default=' ')
+    quantity = models.PositiveIntegerField(default=1)
+
    
     # is the food is available 
     is_sale = models.BooleanField(default=True)
@@ -30,6 +32,8 @@ class Product(models.Model):
 
         return self.name
     
+
+
 
 class Landing_img(models.Model):
     image = models.ImageField(upload_to='uploads/landing/')
