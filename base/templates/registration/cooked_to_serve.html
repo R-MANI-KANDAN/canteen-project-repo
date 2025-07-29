@@ -33,7 +33,11 @@
 
     <!-- Header Section -->
     <div class="header-logo">
-        <img src="Images/Ready-To-Grab/licet_logo.png" alt="LICET Cafeteria Logo">
+        {% for img in images %}
+            {% if img.title == 'licet_logo' %}
+                <img src="{{ img.image.url }}" alt="LICET Cafeteria Logo">
+            {% endif %}
+        {% endfor %}
         <h1>LICET Cafeteria</h1>
     </div>
     
@@ -44,62 +48,75 @@
     <div class="container">
         <!-- Veg Fried Rice & Noodles -->
         <section class="category-section hot-beverages">
-            <div class="category-header">
-                <h2>Veg Lunch</h2>
+        <div class="category-header">
+            <h2>Lunch Veg</h2>
+        </div>
+        <div class="scroll-container">
+        {% for product in products %}
+            {% if product.sub_category == 'VEG LUNCH' %}
+            <div class="beverage-card">
+                <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
+                <h3>{{ product.name }}</h3>
+                <div class="price-tag">₹{{ product.price}}</div>
+                <button class="add-cart order-btn" data-product="{{ product.id }}">Add to Cart</button>
+                <select class="qty-cart form-select"  aria-label="Default select example" style="display:none;" >
+                    <option selected value="1">1</option>
+                </select>
             </div>
-            {% for product in products %}
-                {% if product.sub_category == 'VEG LUNCH' %}
-                <div class="beverage-card">
-                    <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
-                    <h3>{{ product.name }}</h3>
-                    <div class="price-tag">₹{{ product.price}}</div>
-                    <button class="add-cart order-btn" value = "{{ product.id }" }>Add to Cart</button>
-                </div>
-                {% endif %}
-            {% endfor %}
-            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
         </section>
-    <div class="container">
+
         <!-- Non-Veg -->
-        <section class="category-section cold-beverages">
-            <div class="category-header">
-                <h2>Non-Veg Lunch</h2>
+        <section class="category-section hot-beverages">
+        <div class="category-header">
+            <h2>Non Veg</h2>
+        </div>
+        <div class="scroll-container">
+        {% for product in products %}
+            {% if product.sub_category == 'NON VEG' %}
+            <div class="beverage-card">
+                <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
+                <h3>{{ product.name }}</h3>
+                <div class="price-tag">₹{{ product.price}}</div>
+                <button class="add-cart order-btn" data-product="{{ product.id }}">Add to Cart</button>
+                <select class="qty-cart form-select"  aria-label="Default select example" style="display:none;" >
+                    <option selected value="1">1</option>
+                </select>
             </div>
-            {% for product in products %}
-                {% if product.sub_category == 'NON VEG' %}
-                <div class="beverage-card">
-                    <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
-                    <h3>{{ product.name }}</h3>
-                    <div class="price-tag">₹{{ product.price}}</div>
-                    <button class="add-cart order-btn">Add to Cart</button>
-                </div>
-                {% endif %}
-            {% endfor %}
-            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
         </section>
+
 
         
-    <div class="container">
         <!--Veg -->
         <section class="category-section hot-beverages">
-            <div class="category-header">
-                <h2>Veg Noodles</h2>
+        <div class="category-header">
+            <h2>Veg Noodles</h2>
+        </div>
+        <div class="scroll-container">
+        {% for product in products %}
+            {% if product.sub_category == 'VEG NOODLES' %}
+            <div class="beverage-card">
+                <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
+                <h3>{{ product.name }}</h3>
+                <div class="price-tag">₹{{ product.price}}</div>
+                <button class="add-cart order-btn" data-product="{{ product.id }}">Add to Cart</button>
+                <select class="qty-cart form-select"  aria-label="Default select example" style="display:none;" >
+                    <option selected value="1">1</option>
+                </select>
             </div>
-            {% for product in products %}
-                {% if product.sub_category == 'VEG NOODLES' %}
-                <div class="beverage-card">
-                    <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
-                    <h3>{{ product.name }}</h3>
-                    <div class="price-tag">₹{{ product.price}}</div>
-                    <button class="add-cart order-btn">Add to Cart</button>
-                </div>
-                {% endif %}
-            {% endfor %}   
-            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
         </section>
 
+
        
-        <button class="cart-button" onclick="window.location.href='6.Cart.html'">🛒 Cart (<span id="cart-count">0</span>)</button>
+          <a href="{% url 'cart_summary' %}" class="cart-button">🛒 Cart (<span id="cart_quantity">{{ cart|length }}</span>)</a>
     </div>
 
     <!-- Footer -->
@@ -127,28 +144,36 @@
 
   // ---------------- CART SYSTEM ----------------
 
+$(document).on('click', '.add-cart', function(e) {
+    e.preventDefault();
+    const productId = $(this).data('product');
+    // Get the quantity from the input field for this product
+    $.ajax({
+        type: 'POST',
+        url : '{% url "cart_add" %}',
+        data: {
+            product_id: productId,
+            product_quantity: $(this).closest('.beverage-card').find('.qty-cart').text(),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            action: 'post'
+        },
+        success: function(json) {
+            document.getElementById('cart_quantity').textContent = json.quantity;
+            console.log('Item added to cart:', json);
+        },
+        error: function(xhr, errormsg, error) {
+            console.error('Error adding item to cart:', error);
+        }
+
+
+    });
+});
+</script>
 
 
 
  
- $(document).on('click', '.cart-add', function(e) {
-    e.preventDefault();
-    $.ajax({
-      type: 'POST',
-      url: '{% url "cart_add" %}',
-      data: {
-        product_id: $(this).val(),
-        csrfmiddlewaretoken: '{{ csrf_token }}',
-        action: 'post'
-      },
-      success: function(json) {
-        console.log(json);
-      },
-      error: function(xhr, errmsg, err) {
-        console.log(xhr.status + ": " + xhr.responseText);
-      }
-    });
-  });
+
   
 //   const cartElement = document.getElementById('cart-count');
 

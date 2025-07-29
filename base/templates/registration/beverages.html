@@ -14,15 +14,7 @@
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
-    </div>
-
-    <!-- Navigation of Side Bar-->
-  <nav class="sidebar" id="sidebar">
-  <a href="0.Landing Page.html">Home</a>
-  <a href="0.Landing Page.html">Menu</a> <!-- change filename as needed -->
-  <a href="6.Cart.html">Cart</a>
-  <a href="Contact.html">Contact</a> <!-- or use mailto or a contact section -->
-  </nav>
+    </div>  
 
     <!-- User Button -->
     <div class="user-button">
@@ -38,10 +30,14 @@
     </nav>
 
     <!-- Header Section -->
-    <div class="header-logo">
-        <img src="Images/Beverages/licet_logo.png" alt="LICET Cafeteria Logo">
-        <h1>LICET Cafeteria</h1>
-    </div>
+    <header class="centered-header">
+    {%for img in images%}
+      {% if img.title == 'licet_logo' %}
+        <img src="{{img.image.url}}" alt="LICET Cafeteria Logo" class="logo">
+      {% endif %}
+    {% endfor %}
+    <h1>LICET Cafeteria</h1>
+  </header>
     
     <!-- Added Beverage Menu Heading -->
     <h1 class="menu-heading">Beverage Menu</h1>
@@ -53,65 +49,43 @@
             <h2>Milkshakes & Specials</h2>
         </div>
         <div class="scroll-container">
+        {% for product in products %}
+            {% if product.sub_category == 'MILKSHAKE & SPECIAL' %}
             <div class="beverage-card">
-            <img src="Images/Beverages/rose-milk.jpg" class="beverage-image" alt="Rose Milk">
-            <h3>Rose Milk</h3>
-            <p>Floral chill</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
+                <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
+                <h3>{{ product.name }}</h3>
+                <div class="price-tag">₹{{ product.price}}</div>
+                <button class="add-cart order-btn" data-product="{{ product.id }}">Add to Cart</button>
+                <select class="qty-cart form-select"  aria-label="Default select example" style="display:none;" >
+                    <option selected value="1">1</option>
+                </select>
             </div>
-            <div class="beverage-card">
-            <img src="Images/Beverages/badam.jpg" class="beverage-image" alt="Badam">
-            <h3>Badam</h3>
-            <p>Nutty milk</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            <div class="beverage-card">
-            <img src="Images/Beverages/strawberry.jpg" class="beverage-image" alt="Strawberry">
-            <h3>Strawberry</h3>
-            <p>Sweet shake</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            <div class="beverage-card">
-            <img src="Images/Beverages/lassi.jpg" class="beverage-image" alt="Lassi">
-            <h3>Lassi</h3>
-            <p>Churned curd</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            <div class="beverage-card">
-            <img src="Images/Beverages/choco-milk.jpg" class="beverage-image" alt="Choco Milk">
-            <h3>Choco Milk</h3>
-            <p>Chocolatey drink</p>
-            <div class="price-tag">₹50</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            <div class="beverage-card">
-            <img src="Images/Beverages/dates.jpg" class="beverage-image" alt="Dates Shake">
-            <h3>Dates Shake</h3>
-            <p>Natural sweet</p>
-            <div class="price-tag">₹50</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
+            {% endif %}
+          {% endfor %}
         </div>
         </section>
 
         <!-- Fresh Juices -->
-        <section class="category-section cold-beverages">
+        <section class="category-section hot-beverages">
         <div class="category-header">
-            <h2>Fresh Juices</h2>
+            <h2>Cool drink</h2>
         </div>
         <div class="scroll-container">
-
+        {% for product in products %}
+            {% if product.sub_category == '' %}
             <div class="beverage-card">
-            <img src="Images/Beverages/lemon.jpg" class="beverage-image" alt="Lemon Juice">
-            <h3>Lemon Juice</h3>
-            <p>Cool citrus</p>
-            <div class="price-tag">₹20</div>
-            <button class="order-btn">Add to Cart</button>
+                <img src="{{product.image.url}}" class="beverage-image" alt="Masala Chai">
+                <h3>{{ product.name }}</h3>
+                <div class="price-tag">₹{{ product.price}}</div>
+                <button class="add-cart order-btn" data-product="{{ product.id }}">Add to Cart</button>
+                <select class="qty-cart form-select"  aria-label="Default select example" style="display:none;" >
+                    <option selected value="1">1</option>
+                </select>
             </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        </section>
 
             <div class="beverage-card">
             <img src="Images/Beverages/watermelon.jpg" class="beverage-image" alt="Watermelon Juice">

@@ -167,7 +167,7 @@
 
         <tbody>
           {% if cart_products %}
-            {% for product in cart_products %}
+            {% for product in cart_products.items %}
             <tr>
               <td>
                 <img src="{{ product.image.url }}" class="food-img" alt="{{ product.name }}">
@@ -178,19 +178,13 @@
                 <select class="form-select" aria-label="Default select example" id ="select{{ product.id }}" >
                     {% for key,value in product_quantities %}
                       {% if key == product.id|slugify %}
-                    <option selected>{{ value }}</option>
+                    <option selected value = "{{ value }}">{{ value }}</option>
                       {% endif %}
-                    {% endfor %}
+                    {% endfor %}  
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
+    
                  </select>
               </td>
               <td>₹{{ product.price|floatformat:2|add:"0"|floatformat:2 }}</td>
@@ -324,31 +318,32 @@
 <script>
 $(document).on('click', '.update-cart', function(e) {
     e.preventDefault();
+    
     var productId = $(this).data('index');
+    var productQuantity = $('#select' + productId + ' option:selected').text();
 
     $.ajax({
-        type: 'POST',
-        url: "{% url 'cart_update' %}",
-        data: {
-            product_id: $(this).data('index'),
-            product_quantity: $('#select' + productId + ' option:selected').text(),
-            csrfmiddlewaretoken: '{{ csrf_token }}',
-            action: 'post'
+        type: 'PATCH',
+        url: '{% url "cart_update" %}',
+        data: JSON.stringify({
+            product_id: productId,
+            product_quantity: productQuantity
+        }),
+        contentType: 'application/json',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'  // CSRF token header is needed for Django to accept it
         },
         success: function(json) {
-            // document.getElementById('cart_quantity').textContent = json.quantity;
-            // console.log('Item added to cart:', json);
-            console.log('Updated product id:', productId);
-            console.log('Updated quantity:', $('#select' + productId + ' option:selected').val());
-            location.reload();
-            // Update the cart quantity display   
-
+            console.log('✅ Updated product id:', productId);
+            console.log('✅ Updated quantity:', productQuantity);
+            location.reload(); // Reload the page to reflect changes
         },
         error: function(xhr, errormsg, error) {
-            console.error('Error adding item to cart:', error);
+            console.error('❌ Error updating cart:', error);
         }
     });
 });
+
 
 //     // Toggle Sidebar
 //     function toggleSidebar() {

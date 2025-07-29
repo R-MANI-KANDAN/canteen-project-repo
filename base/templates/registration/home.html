@@ -34,7 +34,11 @@
 
   <!-- Centered Logo and Title -->
   <header class="centered-header">
-    <img src="Images/Landing Page/licet_logo.png" alt="LICET Cafeteria Logo" class="logo">
+    {%for img in images%}
+      {% if img.title == 'licet_logo' %}
+        <img src="{{img.image.url}}" alt="LICET Cafeteria Logo" class="logo">
+      {% endif %}
+    {% endfor %}
     <h1>LICET Cafeteria</h1>
   </header>
 
@@ -53,9 +57,11 @@
       <h2>Ready-to-Grab</h2>
       <p>Grab pre-cooked meals ready to pick.</p>
       <div class="items">
-        <a href="#"><img src="Images/Landing Page/biryani.jpg" alt="Biryani" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/idli.jpg" alt="Idli" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/south-indian.jpg" alt="South Indian Meals" loading="lazy"></a>
+      {%for img in images%}
+        {% if img.title == 'biryani' or img.title == 'idli' or img.title == 'south-indian' %}
+          <a href="#"><img src="{{img.image.url}}" alt="Biryani" loading="lazy"></a>
+        {% endif %}
+      {% endfor %}
       </div>
       <a href="{% url 'ready_to_grab' %}" class="button grab-go">Grab & Go</a>
     </section>
@@ -65,9 +71,11 @@
       <h2>Cooked-to-Serve</h2>
       <p>Pick up hot & fresh, right on time.</p>
       <div class="items">
-        <a href="#"><img src="Images/Landing Page/chinese.jpg" alt="Chinese" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/Parotta.jpg" alt="Parotta" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/dosa.jpg" alt="Dosa" loading="lazy"></a>
+      {%for img in images%}
+        {% if img.title == 'chinese' or img.title == 'Parotta' or img.title == 'dosa' %}
+          <a href="#"><img src="{{img.image.url}}" alt="Biryani" loading="lazy"></a>
+        {% endif %}
+      {% endfor %}
       </div>
       <a href="{% url 'cooked_to_serve' %}" class="button fresh-spot">Fresh on Spot</a>
     </section>
@@ -77,9 +85,11 @@
       <h2>Beverages</h2>
       <p>Quench your thirst with refreshing drinks.</p>
       <div class="items">
-        <a href="#"><img src="Images/Landing Page/coffee.jpg" alt="Coffee" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/juice.jpg" alt="Juice" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/soda.jpg" alt="Soda" loading="lazy"></a>
+      {%for img in images%}
+        {% if img.title == 'coffee' or img.title == 'juice' or img.title == 'soda' %}
+          <a href="#"><img src="{{img.image.url}}" alt="Biryani" loading="lazy"></a>
+        {% endif %}
+      {% endfor %}
       </div>
       <a href="{% url 'beverages' %}" class="button beverages-btn">Order Now</a>
     </section>
@@ -89,9 +99,11 @@
       <h2>Snacks</h2>
       <p>Enjoy quick bites and snacks.</p>
       <div class="items">
-        <a href="#"><img src="Images/Landing Page/samosa.jpg" alt="Samosa" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/Bread-Omellet.jpg" alt="Bread-Omellet" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/chips.jpg" alt="Chips" loading="lazy"></a>
+        {%for img in images%}
+        {% if img.title == 'samosa' or img.title == 'Bread-Omellet' or img.title == 'chips' %}
+          <a href="#"><img src="{{img.image.url}}" alt="Biryani" loading="lazy"></a>
+        {% endif %}
+      {% endfor %}
       </div>
       <a href="{% url 'snacks' %}" class="button snacks-btn">Order Now</a>
     </section>
@@ -101,9 +113,11 @@
       <h2>Side Dishes</h2>
       <p>Complement your meal with delicious sides.</p>
       <div class="items">
-        <a href="#"><img src="Images/Landing Page/fried.jpg" alt="Fried" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/Poriyal.jpg" alt="Poriyal" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/Side-Dips.jpg" alt="Side-Dips" loading="lazy"></a>
+      {%for img in images%}
+        {% if img.title == 'fried' or img.title == 'Poriyal' or img.title == 'Side-Dips' %}
+          <a href="#"><img src="{{img.image.url}}" alt="Biryani" loading="lazy"></a>
+        {% endif %}
+      {% endfor %}
       </div>
       <a href="{% url 'sidedish' %}"  class="button side-dishes-btn">Order Now</a>
     </section>
@@ -216,9 +230,11 @@
   <footer class="footer">
     <p>&copy; 2025 LICET Cafeteria. All rights reserved.</p>
     <div class="social-links">
-      <a href="#" aria-label="Facebook"><img src="Images/Landing Page/facebook.jpg" alt="Facebook"></a>
-      <a href="#" aria-label="Instagram"><img src="Images/Landing Page/instagram.jpg" alt="Instagram"></a>
-      <a href="#" aria-label="Twitter"><img src="Images/Landing Page/X.png" alt="Twitter"></a>
+      {%for img in images%}
+        {% if img.title == 'facebook' or img.title == 'instagram' or img.title == 'X' %}
+          <a href="#"><img src="{{img.image.url}}" alt="Biryani" loading="lazy"></a>
+        {% endif %}
+      {% endfor %}
     </div>
   </footer>
 
