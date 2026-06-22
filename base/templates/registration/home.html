@@ -25,95 +25,93 @@
         <div class="bar"></div>
     </div>
 
-    <!-- Navigation of Side Bar-->
+    <!-- Navigation Sidebar -->
   <nav class="sidebar" id="sidebar">
-  <a href="{% url 'home' %}">Home</a>
-  <a href="{% url 'cart_summary' %}">Cart</a>
-  <a href="{% url 'contact' %}">Contact</a> <!-- or use mailto or a contact section -->
+    <a href="{% url 'home' %}"><i class="fas fa-home" style="margin-right:10px;"></i>Home</a>
+    <a href="{% url 'ready_to_grab' %}"><i class="fas fa-box-open" style="margin-right:10px;"></i>Ready to Grab</a>
+    <a href="{% url 'cooked_to_serve' %}"><i class="fas fa-fire" style="margin-right:10px;"></i>Cooked to Serve</a>
+    <a href="{% url 'beverages' %}"><i class="fas fa-coffee" style="margin-right:10px;"></i>Beverages</a>
+    <a href="{% url 'snacks' %}"><i class="fas fa-cookie-bite" style="margin-right:10px;"></i>Snacks</a>
+    <a href="{% url 'sidedish' %}"><i class="fas fa-drumstick-bite" style="margin-right:10px;"></i>Side Dishes</a>
+    <a href="{% url 'cart_summary' %}"><i class="fas fa-shopping-cart" style="margin-right:10px;"></i>Cart</a>
+    <a href="{% url 'contact' %}"><i class="fas fa-envelope" style="margin-right:10px;"></i>Contact</a>
   </nav>
 
-  <!-- Centered Logo and Title -->
+  <!-- Hero Header -->
   <header class="centered-header">
-    <img src="Images/Landing Page/licet_logo.png" alt="LICET Cafeteria Logo" class="logo">
+    <div style="font-size: 3.5rem; color: #f97316; margin-bottom: 8px; text-shadow: 0 0 40px rgba(249,115,22,0.4);"><i class="fas fa-utensils"></i></div>
     <h1>LICET Cafeteria</h1>
+    <p style="color: rgba(255,255,255,0.6); font-size: 1.05rem; margin-top: 8px; font-weight: 300;">Fresh food, fast service — skip the queue.</p>
   </header>
 
-  <!-- Sidebar Navigation -->
-    <nav class="sidebar" id="sidebar">
-        <a href="#">Home</a>
-        <a href="#">Menu</a>
-        <a href="#">Cart</a>
-        <a href="#">Contact</a>
-    </nav>
-    
-  <!-- Centered Content -->
+  <!-- Menu Sections -->
   <main class="centered-content">
     <!-- Ready-to-Grab Section -->
     <section class="section ready-to-grab">
-      <h2>Ready-to-Grab</h2>
+      <h2>🍱 Ready-to-Grab</h2>
       <p>Grab pre-cooked meals ready to pick.</p>
       <div class="items">
-        <a href="#"><img src="Images/Landing Page/biryani.jpg" alt="Biryani" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/idli.jpg" alt="Idli" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/south-indian.jpg" alt="South Indian Meals" loading="lazy"></a>
+        <a href="{% url 'ready_to_grab' %}"><img src="/media/uploads/product/Chicken_Biryani.jpg" alt="Biryani" loading="lazy"></a>
+        <a href="{% url 'ready_to_grab' %}"><img src="/media/uploads/product/Curd_Rice.jpg" alt="Curd Rice" loading="lazy"></a>
+        <a href="{% url 'ready_to_grab' %}"><img src="/media/uploads/product/Veg_Meals.jpg" alt="South Indian Meals" loading="lazy"></a>
       </div>
-      <a href="{% url 'ready_to_grab' %}" class="button grab-go">Grab & Go</a>
+      <a href="{% url 'ready_to_grab' %}" class="button grab-go">Grab & Go →</a>
     </section>
 
     <!-- Cooked-to-Serve Section -->
     <section class="section cooked-to-serve">
-      <h2>Cooked-to-Serve</h2>
+      <h2>🔥 Cooked-to-Serve</h2>
       <p>Pick up hot & fresh, right on time.</p>
       <div class="items">
-        <a href="#"><img src="Images/Landing Page/chinese.jpg" alt="Chinese" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/Parotta.jpg" alt="Parotta" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/dosa.jpg" alt="Dosa" loading="lazy"></a>
+        <a href="{% url 'cooked_to_serve' %}"><img src="/media/uploads/product/Chicken_Fried_Rice.jpg" alt="Chinese" loading="lazy"></a>
+        <a href="{% url 'cooked_to_serve' %}"><img src="/media/uploads/product/Parotta.jpg" alt="Parotta" loading="lazy"></a>
+        <a href="{% url 'cooked_to_serve' %}"><img src="/media/uploads/product/Chapathi.jpg" alt="Chapathi" loading="lazy"></a>
       </div>
-      <a href="{% url 'cooked_to_serve' %}" class="button fresh-spot">Fresh on Spot</a>
+      <a href="{% url 'cooked_to_serve' %}" class="button fresh-spot">Fresh on Spot →</a>
     </section>
 
     <!-- Beverages Section -->
     <section class="section beverages">
-      <h2>Beverages</h2>
+      <h2>🥤 Beverages</h2>
       <p>Quench your thirst with refreshing drinks.</p>
       <div class="items">
-        <a href="#"><img src="Images/Landing Page/coffee.jpg" alt="Coffee" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/juice.jpg" alt="Juice" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/soda.jpg" alt="Soda" loading="lazy"></a>
+        <a href="{% url 'beverages' %}"><img src="/media/uploads/product/rose-milk.jpg" alt="Rose Milk" loading="lazy"></a>
+        <a href="{% url 'beverages' %}"><img src="/media/uploads/product/lemon.jpg" alt="Lemon Juice" loading="lazy"></a>
+        <a href="{% url 'beverages' %}"><img src="/media/uploads/product/cavins-milkshake.jpg" alt="Milkshake" loading="lazy"></a>
       </div>
-      <a href="{% url 'beverages' %}" class="button beverages-btn">Order Now</a>
+      <a href="{% url 'beverages' %}" class="button beverages-btn">Order Now →</a>
     </section>
 
     <!-- Snacks Section -->
     <section class="section snacks">
-      <h2>Snacks</h2>
+      <h2>🍿 Snacks</h2>
       <p>Enjoy quick bites and snacks.</p>
       <div class="items">
-        <a href="#"><img src="Images/Landing Page/samosa.jpg" alt="Samosa" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/Bread-Omellet.jpg" alt="Bread-Omellet" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/chips.jpg" alt="Chips" loading="lazy"></a>
+        <a href="{% url 'snacks' %}"><img src="/media/uploads/product/samosa.jpg" alt="Samosa" loading="lazy"></a>
+        <a href="{% url 'snacks' %}"><img src="/media/uploads/product/Egg_Podi_Mass.jpg" alt="Egg Podi Mass" loading="lazy"></a>
+        <a href="{% url 'snacks' %}"><img src="/media/uploads/product/french-fries.jpg" alt="French Fries" loading="lazy"></a>
       </div>
-      <a href="{% url 'snacks' %}" class="button snacks-btn">Order Now</a>
+      <a href="{% url 'snacks' %}" class="button snacks-btn">Order Now →</a>
     </section>
 
     <!-- Side Dishes Section -->
     <section class="section side-dishes">
-      <h2>Side Dishes</h2>
+      <h2>🍗 Side Dishes</h2>
       <p>Complement your meal with delicious sides.</p>
       <div class="items">
-        <a href="#"><img src="Images/Landing Page/fried.jpg" alt="Fried" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/Poriyal.jpg" alt="Poriyal" loading="lazy"></a>
-        <a href="#"><img src="Images/Landing Page/Side-Dips.jpg" alt="Side-Dips" loading="lazy"></a>
+        <a href="{% url 'sidedish' %}"><img src="/media/uploads/product/Chicken_65.jpg" alt="Chicken 65" loading="lazy"></a>
+        <a href="{% url 'sidedish' %}"><img src="/media/uploads/product/Variety_Rice.jpg" alt="Variety Rice" loading="lazy"></a>
+        <a href="{% url 'sidedish' %}"><img src="/media/uploads/product/gobi65.jpg" alt="Gobi 65" loading="lazy"></a>
       </div>
-      <a href="{% url 'sidedish' %}"  class="button side-dishes-btn">Order Now</a>
+      <a href="{% url 'sidedish' %}" class="button side-dishes-btn">Order Now →</a>
     </section>
   </main>
 
   <!-- User Section with Dropdown -->
   <div class="user-section">
     <button class="user-button" onclick="toggleDropdown()">
-      <img src="Images/Landing Page/User-Logo.png" alt="User Profile">
-      <span class="user-info" id="userName">User Name</span>
+      <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}" alt="User Profile">
+      <span class="user-info" id="userName">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.email }}{% endif %}</span>
       <i class="fas fa-chevron-down" style="margin-left: 5px; font-size: 12px;"></i>
     </button>
     
@@ -152,7 +150,7 @@
         <!-- Profile Picture Section -->
         <div class="profile-pic-section">
           <div class="profile-pic-container">
-            <img id="profilePicPreview" src="Images/Landing Page/User-Logo.png" alt="Profile Picture" class="profile-pic-preview">
+            <img id="profilePicPreview" src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}" alt="Profile Picture" class="profile-pic-preview">
             <div class="profile-pic-overlay" onclick="document.getElementById('profilePicInput').click()">
               <i class="fas fa-camera"></i>
             </div>
@@ -193,19 +191,16 @@
           <label for="department">Department</label>
           <select id="department" name="department">
             <option value="">Select Department</option>
-            <option value="Computer Science">Computer Science</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Mechanical">Mechanical</option>
-            <option value="Civil">Civil</option>
-            <option value="Electrical">Electrical</option>
-            <option value="Information Technology">Information Technology</option>
+            <option value="CSE">CSE</option>
+            <option value="ECE">ECE</option>
+            <option value="IT">IT</option>
+            <option value="EEE">EEE</option>
+            <option value="MECH">MECH</option>
+            <option value="AIDS">AIDS</option>
           </select>
         </div>
         
-        <div class="form-group">
-          <label for="dateOfBirth">Date of Birth</label>
-          <input type="date" id="dateOfBirth" name="dateOfBirth">
-        </div>
+
         
         <button type="button" class="save-btn" onclick="saveProfile()">Save Changes</button>
       </form>
@@ -216,9 +211,9 @@
   <footer class="footer">
     <p>&copy; 2025 LICET Cafeteria. All rights reserved.</p>
     <div class="social-links">
-      <a href="#" aria-label="Facebook"><img src="Images/Landing Page/facebook.jpg" alt="Facebook"></a>
-      <a href="#" aria-label="Instagram"><img src="Images/Landing Page/instagram.jpg" alt="Instagram"></a>
-      <a href="#" aria-label="Twitter"><img src="Images/Landing Page/X.png" alt="Twitter"></a>
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook fa-lg" style="color:white; margin: 0 10px;"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram fa-lg" style="color:white; margin: 0 10px;"></i></a>
+      <a href="#" aria-label="Twitter"><i class="fab fa-twitter fa-lg" style="color:white; margin: 0 10px;"></i></a>
     </div>
   </footer>
 
@@ -266,7 +261,6 @@
   document.getElementById('yearOfStudy').value = userData.yearOfStudy || '';
   document.getElementById('batch').value = userData.batch || '';
   document.getElementById('department').value = userData.department || '';
-  document.getElementById('dateOfBirth').value = userData.dateOfBirth || '';
 
   // Load profile picture
   if (userData.profilePic) {
@@ -321,7 +315,6 @@
         yearOfStudy: document.getElementById('yearOfStudy').value,
         batch: document.getElementById('batch').value,
         department: document.getElementById('department').value,
-        dateOfBirth: document.getElementById('dateOfBirth').value,
         profilePic: window.tempProfilePic || window.userData?.profilePic || 'Images/Landing Page/User-Logo.png'
       };
 

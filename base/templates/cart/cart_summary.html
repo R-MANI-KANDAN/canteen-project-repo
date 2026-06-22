@@ -1,639 +1,408 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  {%load static%}
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LICET Canteen Cart</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-  <link href="6.Cart.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <link rel="stylesheet" href="{% static 'accounts/cart_summary.css' %}" >
-</head>
-<body>
+{% extends "registration/base.html" %}
+{% load static %}
 
-  <nav class="sidebar" id="sidebar">
-  <a href="{% url 'home' %}">Home</a>
-  <a href="{% url 'cart_summary' %}">Cart</a>
-  <a href="{% url 'contact' %}">Contact</a> <!-- or use mailto or a contact section -->
-  </nav>
+{% block title %}Your Cart – LICET Cafeteria{% endblock %}
 
-  <!-- Hamburger Menu -->
-    <div class="hamburger-menu" onclick="toggleSidebar()">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
+{% block extra_css %}
+  <style>
+    .cart-page { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; }
+    h2.page-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 1.25rem; }
+
+    /* Cart Table - Translucent */
+    .cart-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; background: rgba(22, 22, 35, 0.4); border-radius: 12px; overflow: hidden; }
+    .cart-table th {
+      text-align: left; padding: .9rem 1rem;
+      font-size: .8rem; color: var(--text-muted); font-weight: 500;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .cart-table td { padding: 1rem; border-bottom: 1px solid var(--border); }
+    .item-cell { display: flex; align-items: center; gap: .75rem; }
+    .item-cell img { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .item-name { font-weight: 600; font-size: .9rem; }
+    .qty-ctrl { display: flex; align-items: center; gap: .4rem; }
+    
+    .qty-btn {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+      color: var(--text); font-size: 1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .qty-btn:hover { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 0 10px var(--brand-glow); }
+    .qty-value { font-weight: 600; min-width: 24px; text-align: center; }
+    .remove-btn {
+      background: transparent; border: none; color: #f87171;
+      cursor: pointer; font-size: .85rem; padding: .25rem;
+      transition: var(--transition);
+    }
+    .remove-btn:hover { color: #ef4444; transform: scale(1.1); }
+    .price-cell { font-weight: 700; color: var(--brand); }
+
+    /* Empty State */
+    .empty-cart {
+      text-align: center; padding: 4rem 1rem; color: var(--text-muted);
+      background: rgba(22, 22, 35, 0.6); backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius);
+    }
+    .empty-cart .icon { font-size: 4rem; margin-bottom: 1rem; animation: bounce 2s infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    /* Summary Box & Cards - Glassmorphism */
+    .summary-box, .section-card {
+      background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+    .summary-row { display: flex; justify-content: space-between; padding: .4rem 0; font-size: .9rem; }
+    .summary-row.total { font-weight: 700; font-size: 1.05rem; border-top: 1px solid var(--border); margin-top: .5rem; padding-top: .75rem; }
+    .coupon-row { display: flex; gap: .5rem; margin-top: .75rem; }
+    .coupon-row input {
+      flex: 1; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); color: var(--text); padding: .45rem .75rem;
+      font-family: inherit; font-size: .875rem; transition: border-color var(--transition);
+    }
+    .coupon-row input:focus { outline: none; border-color: var(--brand); background: rgba(249, 115, 22, 0.05); }
+    .coupon-row button {
+      background: rgba(255, 255, 255, 0.08); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); color: var(--text);
+      padding: .45rem .85rem; cursor: pointer; font-size: .875rem; font-weight: 500;
+      transition: all var(--transition);
+    }
+    .coupon-row button:hover { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 2px 10px var(--brand-glow); }
+
+    /* Slot & Type Cards */
+    .section-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .75rem; display: flex; align-items: center; gap: .4rem; }
+    .option-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .chip {
+      padding: .45rem .95rem; border-radius: 20px;
+      border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted); cursor: pointer; font-size: .85rem; font-weight: 500;
+      transition: all var(--transition);
+    }
+    .chip.active, .chip:hover { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 4px 15px var(--brand-glow); }
+
+    /* Date */
+    input[type="date"].date-input {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); color: var(--text);
+      padding: .5rem .75rem; font-family: inherit; font-size: .875rem;
+      color-scheme: dark; transition: border-color var(--transition);
+    }
+    input[type="date"].date-input:focus { outline: none; border-color: var(--brand); }
+
+    /* Checkout Button */
+    .checkout-btn {
+      width: 100%; padding: .85rem; border: none; border-radius: var(--radius);
+      background: var(--brand); color: #fff;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      transition: all var(--transition); display: flex; align-items: center; justify-content: center; gap: .5rem;
+      box-shadow: 0 4px 20px var(--brand-glow);
+    }
+    .checkout-btn:hover:not(:disabled) { background: var(--brand-dark); transform: translateY(-2px); box-shadow: 0 6px 24px var(--brand-glow); }
+    .checkout-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* Receipt Modal - Glassmorphism */
+    .receipt-modal { display: none; position: fixed; inset: 0; z-index: 600;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; }
+    .receipt-modal.open { display: flex; }
+    .receipt-box {
+      background: rgba(22, 22, 40, 0.95); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px; width: 90%; max-width: 400px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5); padding: 1.5rem;
+      animation: modalUp .3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .receipt-title { font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 1rem; color: #4ade80; }
+    .receipt-row { display: flex; justify-content: space-between; padding: .4rem 0; font-size: .875rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .receipt-row:last-of-type { border-bottom: none; border-top: 1px solid var(--border); margin-top: .5rem; padding-top: .75rem; font-weight: 700; font-size: 1rem; color: var(--brand); }
+    #receiptQR { margin: 1rem auto 0; text-align: center; padding: .5rem; background: #fff; border-radius: 12px; display: inline-block; width: auto; }
+    #receiptQR canvas { display: block; }
+    .receipt-actions { display: flex; gap: .5rem; margin-top: 1.25rem; }
+    .receipt-actions button {
+      flex: 1; padding: .65rem; border-radius: 50px; font-size: .875rem;
+      font-weight: 600; cursor: pointer; transition: all var(--transition); font-family: inherit;
+    }
+    .btn-done { background: var(--brand); color: #fff; border: none; box-shadow: 0 2px 10px var(--brand-glow); }
+    .btn-done:hover { background: var(--brand-dark); transform: translateY(-1px); }
+    .btn-dl { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--glass-border); }
+    .btn-dl:hover { border-color: var(--brand); color: var(--brand); }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="cart-page">
+  <h2 class="page-title">🛒 Your Cart</h2>
+
+  <!-- Cart Table -->
+  <div id="cart-container">
+    <!-- Rendered by JS -->
+  </div>
+
+  <!-- Summary + Slot + Checkout -->
+  <div id="checkout-panel" style="display:none">
+    <!-- Summary -->
+    <div class="summary-box">
+      <div class="summary-row"><span>Subtotal</span><span>₹<span id="subtotal">0</span></span></div>
+      <div class="summary-row"><span>Discount</span><span>-₹<span id="discount">0</span></span></div>
+      <div class="summary-row total"><span>Total</span><span>₹<span id="total">0</span></span></div>
+      <div class="coupon-row">
+        <input type="text" id="coupon" placeholder="Coupon code (e.g. LICET5)">
+        <button onclick="applyCoupon()">Apply</button>
+      </div>
     </div>
 
-  <!-- User Section with Dropdown -->
-  <div class="user-section"> 
-    <button class="user-button" onclick="toggleDropdown()">
-      <img src="Images/Landing Page/User-Logo.png" alt="User Profile">
-      <span class="user-info" id="userName">User Name</span>
-      <i class="fas fa-chevron-down" style="margin-left: 5px; font-size: 12px;"></i>
+    <!-- Date Selection -->
+    <div class="section-card">
+      <h3>📅 Pickup Date</h3>
+      <input type="date" id="order-date" class="date-input">
+    </div>
+
+    <!-- Time Slot -->
+    <div class="section-card">
+      <h3>🕐 Pickup Time Slot</h3>
+      <div class="option-chips" id="time-chips">
+        <div class="chip active" data-value="12:45">12:45 PM</div>
+        <div class="chip" data-value="12:50">12:50 PM</div>
+        <div class="chip" data-value="12:55">12:55 PM</div>
+        <div class="chip" data-value="13:00">1:00 PM</div>
+        <div class="chip" data-value="13:05">1:05 PM</div>
+        <div class="chip" data-value="13:10">1:10 PM</div>
+      </div>
+    </div>
+
+    <!-- Order Type -->
+    <div class="section-card">
+      <h3>🍽️ Order Type</h3>
+      <div class="option-chips" id="type-chips">
+        <div class="chip active" data-value="Dine In">🍽️ Dine In</div>
+        <div class="chip" data-value="Takeaway">📦 Takeaway</div>
+      </div>
+    </div>
+
+    <!-- Checkout -->
+    <button class="checkout-btn" id="checkoutBtn" onclick="placeOrder()">
+      ✅ Place Order
     </button>
-    
-    <!-- Dropdown Menu -->
-    <div class="dropdown-menu" id="dropdownMenu">
-      <div class="dropdown-header">
-        <div>Welcome back!</div>
-      </div>
-      
-      <a href="#" class="dropdown-item" onclick="openProfileModal()">
-        <i class="fas fa-user-edit"></i>
-        <span>Update Profile</span>
-      </a>
-      
-      <div class="dropdown-item points-section">
-        <i class="fas fa-coins"></i>
-        <span>Points: <strong id="userPoints">250</strong></span>
-      </div>
-      
-      <a href="{% url 'login' %}" class="dropdown-item logout-section">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Logout</span>
-      </a>
+  </div>
+</div>
+
+<!-- Receipt Modal -->
+<div class="receipt-modal" id="receiptModal">
+  <div class="receipt-box">
+    <div class="receipt-title">✅ Order Confirmed!</div>
+    <div class="receipt-row"><span>Order Ref</span><span id="r-ref">–</span></div>
+    <div class="receipt-row"><span>Items</span><span id="r-items">–</span></div>
+    <div class="receipt-row"><span>Pickup</span><span id="r-pickup">–</span></div>
+    <div class="receipt-row"><span>Type</span><span id="r-type">–</span></div>
+    <div class="receipt-row"><span>Total Paid</span><span>₹<span id="r-total">0</span></span></div>
+    <div id="receiptQR"></div>
+    <div class="receipt-actions">
+      <button class="btn-dl" onclick="downloadReceipt()">📥 Download</button>
+      <button class="btn-done" onclick="finishOrder()">Done</button>
     </div>
   </div>
+</div>
+{% endblock %}
 
-  <!-- Profile Update Modal -->
-  <div id="profileModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Update Profile</h2>
-        <button class="close" onclick="closeProfileModal()">&times;</button>
-      </div>
-      
-      <form id="profileForm">
-        <!-- Profile Picture Section -->
-        <div class="profile-pic-section">
-          <div class="profile-pic-container">
-            <img id="profilePicPreview" src="Images/Landing Page/User-Logo.png" alt="Profile Picture" class="profile-pic-preview">
-            <div class="profile-pic-overlay" onclick="document.getElementById('profilePicInput').click()">
-              <i class="fas fa-camera"></i>
-            </div>
-          </div>
-          <div>
-            <input type="file" id="profilePicInput" class="profile-pic-input" accept="image/*" onchange="handleProfilePicChange(event)">
-            <button type="button" class="upload-btn" onclick="document.getElementById('profilePicInput').click()">
-              <i class="fas fa-upload"></i> Choose Photo
-            </button>
-            <button type="button" class="remove-pic-btn" onclick="removeProfilePic()">
-              <i class="fas fa-trash"></i> Remove
-            </button>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="fullName">Full Name</label>
-          <input type="text" id="fullName" name="fullName" placeholder="Enter your full name">
-        </div>
-        
-        <div class="form-group">
-          <label for="yearOfStudy">Year of Study</label>
-          <select id="yearOfStudy" name="yearOfStudy">
-            <option value="">Select Year</option>
-            <option value="1st Year">1st Year</option>
-            <option value="2nd Year">2nd Year</option>
-            <option value="3rd Year">3rd Year</option>
-            <option value="4th Year">4th Year</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="batch">Batch</label>
-          <input type="text" id="batch" name="batch" placeholder="e.g., 2021-2025">
-        </div>
-        
-        <div class="form-group">
-          <label for="department">Department</label>
-          <select id="department" name="department">
-            <option value="">Select Department</option>
-            <option value="Computer Science">Computer Science</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Mechanical">Mechanical</option>
-            <option value="Civil">Civil</option>
-            <option value="Electrical">Electrical</option>
-            <option value="Information Technology">Information Technology</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="dateOfBirth">Date of Birth</label>
-          <input type="date" id="dateOfBirth" name="dateOfBirth">
-        </div>
-        
-        <button type="button" class="save-btn" onclick="saveProfile()">Save Changes</button>
-      </form>
-    </div>
-  </div>
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script>
+const CSRF = getCsrfToken();
 
-  <!-- Sidebar Navigation -->
-  <nav class="sidebar" id="sidebar">
-    <a href="#">Home</a>
-    <a href="#">Menu</a>
-    <a href="#">Cart</a>
-    <a href="#">Contact</a>
-  </nav>
+// ── State ─────────────────────────────────────────────────────────────────────
+let cartItems  = getCart();    // [{ id, name, price, img, qty }, …]
+let selectedTime = '12:45';
+let selectedType = 'Dine In';
+let discountAmount = 0;
 
-  <header>
-    <!-- College Logo Placeholder - Replace with your actual logo -->
-    <img src="Images/Cart/licet_logo.png" alt="LICET Logo" class="college-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-    <div class="college-logo" style="display: none;">L</div>
-    <h1>LICET Cafeteria</h1>
-  </header>
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderCart() {
+  cartItems = getCart();
+  const container = document.getElementById('cart-container');
+  const panel     = document.getElementById('checkout-panel');
 
-  <nav>
-    <a href="#cart">🛒 Cart</a>
-    <a href="#slot">📅 Slot</a>
-    <a href="#payment">💳 Payment</a>
-    <a href="#receipt">🧾 Receipt</a>
-  </nav>
-
-  <main>
-    <section id="cart" class="active">
-      <h2>Your Cart</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Subtotal</th>
-          </tr>
-        </thead>
-        <tbody id="cart-body"></tbody>
-      </table>
-
-      <div class="summary-box">
-        <p><strong>Subtotal:</strong> <span>₹<span id="subtotal">0</span></span></p>
-        <p><strong>Discount (5%):</strong> <span>₹<span id="discount">0</span></span></p>
-        <p><strong>Total Amount:</strong> <span>₹<span id="total">0</span></span></p>
-        <input type="text" id="coupon" placeholder="Enter coupon code (e.g. LICET5)" />
-      </div>
-    </section>
-
-    <section id="slot">
-      <h2>Select Date</h2>
-      <div class="calendar-container">
-        <input type="date" id="order-date">
-      </div>
-
-      <h2>Select Time Slot</h2>
-      <div class="scroll-row">
-        <button class="option-btn active" data-time="12:45">12:45 PM</button>
-        <button class="option-btn" data-time="12:50">12:50 PM</button>
-        <button class="option-btn" data-time="12:55">12:55 PM</button>
-        <button class="option-btn" data-time="1:00">1:00 PM</button>
-        <button class="option-btn" data-time="1:05">1:05 PM</button>
-      </div>
-
-      <h2>Order Type</h2>
-      <div class="scroll-row">
-        <button class="option-btn active" data-type="Dine In">🍽️ Dine In</button>
-        <button class="option-btn" data-type="Takeaway">📦 Takeaway</button>
-      </div>
-    </section>
-
-    <section id="payment">
-      <h2>Payment Method</h2>
-      <div class="scroll-row">
-        <!-- Payment buttons with logo placeholders -->
-        <button class="payment-btn active">
-          <img src="Images/Cart/google-pay-logo.png" alt="Google Pay" class="payment-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="payment-logo" style="display: none;">GP</div>
-          Google Pay
-        </button>
-        <button class="payment-btn">
-          <img src="Images/Cart/phonepe-logo.png" alt="PhonePe" class="payment-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="payment-logo" style="display: none;">PP</div>
-          PhonePe
-        </button>
-        <button class="payment-btn">
-          <img src="Images/Cart/paytm-logo.png" alt="Paytm" class="payment-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="payment-logo" style="display: none;">PTM</div>
-          Paytm
-        </button>
-        <button class="payment-btn">
-          <img src="Images/Cart/bhim-logo.png" alt="BHIM" class="payment-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="payment-logo" style="display: none;">BHIM</div>
-          BHIM
-        </button>
-      </div>
-    </section>
-
-    <section id="receipt">
-      <h2>Order Receipt</h2>
-      <div class="receipt" id="receipt-content">
-        <div class="receipt-header">
-          <!-- College Logo in Receipt -->
-          <img src="Images/Cart/licet_logo.png" alt="LICET Logo" class="receipt-college-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="receipt-college-logo" style="display: none;">L</div>
-          <h3>LICET Cafeteria</h3>
-          <p>Order Confirmation</p>
-        </div>
-        
-        <div class="receipt-detail">
-          <strong>Order Items:</strong>
-          <span id="receipt-items">Schezwan Fried Rice, Chicken 65</span>
-        </div>
-        
-        <div class="receipt-detail">
-          <strong>Date & Time:</strong>
-          <span><span class="selected-time">12:45 PM</span> on <span id="selected-date">--/--/----</span></span>
-        </div>
-        
-        <div class="receipt-detail">
-          <strong>Order Type:</strong>
-          <span class="selected-type">Dine In</span>
-        </div>
-        
-        <div class="receipt-detail">
-          <strong>Order Number:</strong>
-          <span id="order-number">LCT-035</span>
-        </div>
-        
-        <div class="receipt-detail">
-          <strong>Amount Paid:</strong>
-          <span>₹<span id="receipt-total">0</span></span>
-        </div>
-        
-        <div id="qrcode"></div>
-        <button id="download-receipt">📥 Download Receipt</button>
-      </div>
-    </section>
-  </main>
-  <!-- Footer -->
-  <footer class="footer">
-    <p>&copy; 2025 LICET Cafeteria. All rights reserved.</p>
-    <div class="social-links">
-      <a href="#" aria-label="Facebook"><img src="Images/Landing Page/facebook.jpg" alt="Facebook"></a>
-      <a href="#" aria-label="Instagram"><img src="Images/Landing Page/instagram.jpg" alt="Instagram"></a>
-      <a href="#" aria-label="Twitter"><img src="Images/Landing Page/X.png" alt="Twitter"></a>
-    </div>
-  </footer>
-
-  <script>
-    // Toggle Sidebar
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('active');
-    }
-
-    // Close sidebar when clicking outside
-    document.addEventListener('click', function(event) {
-      const sidebar = document.getElementById('sidebar');
-      const hamburger = document.querySelector('.hamburger-menu');
-      
-      if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
-        sidebar.classList.remove('active');
-      }
-    });
-
-    // Sample cart items
-    let items = JSON.parse(localStorage.getItem('cartItems')) || [];
-
-
-    let selectedTime = '12:45 PM';
-    let selectedType = 'Dine In';
-    let selectedDate = '';
-
-    // DOM elements
-    const cartBody = document.getElementById('cart-body');
-    const subtotalEl = document.getElementById('subtotal');
-    const discountEl = document.getElementById('discount');
-    const totalEl = document.getElementById('total');
-    const couponInput = document.getElementById('coupon');
-    const receiptTotal = document.getElementById('receipt-total');
-    const selectedDateEl = document.getElementById('selected-date');
-    const receiptItems = document.getElementById('receipt-items');
-
-    function renderCart() {
-      cartBody.innerHTML = '';
-      let subtotal = 0;
-
-      items.forEach((item, idx) => {
-        const row = document.createElement('tr');
-        const itemTotal = item.price * item.qty;
-        subtotal += itemTotal;
-
-        row.innerHTML = `
-          <td>
-            <div class="item-cell">
-              <img src="${item.img}" class="food-img" alt="${item.name}">
-              <span>${item.name}</span>
-            </div>
-          </td>
-          <td><strong>₹${item.price}</strong></td>
-          <td>
-            <input type="number" min="1" value="${item.qty}" data-idx="${idx}" class="qty-input">
-          </td>
-          <td><strong>₹<span class="subtotal">${itemTotal}</span></strong></td>
-        `;
-        cartBody.appendChild(row);
-      });
-
-      applyDiscount(subtotal);
-      updateReceiptItems();
-    }
-
-    function applyDiscount(subtotal) {
-      const code = couponInput.value.trim();
-      let discount = 0;
-      if (code.toUpperCase() === 'LICET5') {
-        discount = Math.round(subtotal * 0.05);
-      }
-      const total = subtotal - discount;
-
-      subtotalEl.textContent = subtotal;
-      discountEl.textContent = discount;
-      totalEl.textContent = total;
-      receiptTotal.textContent = total;
-      
-      // Update QR code with new total
-      generateQRCode();
-    }
-
-    function updateReceiptItems() {
-      const itemNames = items.map(item => `${item.name} (x${item.qty})`).join(', ');
-      receiptItems.textContent = itemNames;
-    }
-
-    function generateQRCode() {
-      const qrContainer = document.getElementById('qrcode');
-      qrContainer.innerHTML = ''; // Clear existing QR code
-      
-      const orderData = {
-        restaurant: 'LICET Cafeteria',
-        items: items.map(item => `${item.name} x${item.qty}`),
-        total: receiptTotal.textContent,
-        date: selectedDate || new Date().toISOString().split('T')[0],
-        time: selectedTime,
-        type: selectedType,
-        orderNumber: 'LCT-035'
-      };
-      
-      const qrText = `LICET Cafeteria Receipt\nOrder: ${orderData.items.join(', ')}\nDate: ${orderData.date} ${orderData.time}\nType: ${orderData.type}\nTotal: ₹${orderData.total}\nOrder #: ${orderData.orderNumber}`;
-      
-      try {
-        const qr = qrcode(0, 'M');
-        qr.addData(qrText);
-        qr.make();
-        qrContainer.innerHTML = qr.createImgTag(4, 8);
-      } catch (error) {
-        console.error('QR Code generation failed:', error);
-        qrContainer.innerHTML = '<div style="padding: 20px; background: #f0f0f0; border-radius: 8px; color: #666;">QR Code will be generated here</div>';
-      }
-    }
-
-    // Event listeners
-    cartBody.addEventListener('input', (e) => {
-      if (e.target.type === 'number') {
-        const idx = e.target.dataset.idx;
-        const newQty = parseInt(e.target.value);
-        if (newQty > 0) {
-          items[idx].qty = newQty;
-          renderCart();
-        }
-      }
-    });
-
-    couponInput.addEventListener('input', () => {
-      let subtotal = 0;
-      items.forEach(item => {
-        subtotal += item.price * item.qty;
-      });
-      applyDiscount(subtotal);
-    });
-
-    document.getElementById('order-date').addEventListener('change', function() {
-      selectedDate = this.value;
-      selectedDateEl.textContent = this.value || '--/--/----';
-      generateQRCode();
-    });
-
-    // Time slot selection
-    document.querySelectorAll('.option-btn[data-time]').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.option-btn[data-time]').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        selectedTime = this.dataset.time;
-        document.querySelector('.selected-time').textContent = selectedTime;
-        generateQRCode();
-      });
-    });
-
-    // Order type selection
-    document.querySelectorAll('.option-btn[data-type]').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.option-btn[data-type]').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        selectedType = this.dataset.type;
-        document.querySelector('.selected-type').textContent = selectedType;
-        generateQRCode();
-      });
-    });
-
-    // Payment method selection
-    document.querySelectorAll('.payment-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-      });
-    });
-
-    document.getElementById('download-receipt').addEventListener('click', () => {
-      const element = document.getElementById('receipt-content');
-      const opt = {
-        margin: 1,
-        filename: 'LICET_Receipt.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-      };
-      
-      html2pdf().set(opt).from(element).save().then(() => {
-        alert('Receipt downloaded successfully!');
-      });
-    });
-
-    // Initialize
-    renderCart();
-    
-    // Set initial date to today
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('order-date').value = today;
-    selectedDate = today;
-    selectedDateEl.textContent = today;
-
-    // Animate sections
-    const sections = document.querySelectorAll('section');
-    sections.forEach((section, index) => {
-      setTimeout(() => {
-        section.classList.add('active');
-      }, index * 200);
-    });
-
-    // Generate initial QR code
-    setTimeout(generateQRCode, 500);
-
-    // Hamburger Menu Toggle
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('active');
-    }
-
-    // User Dropdown Toggle
-    function toggleDropdown() {
-      const dropdown = document.getElementById('dropdownMenu');
-      dropdown.classList.toggle('active');
-    }
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-      const userSection = document.querySelector('.user-section');
-      const dropdown = document.getElementById('dropdownMenu');
-      
-      if (!userSection.contains(event.target)) {
-        dropdown.classList.remove('active');
-      }
-    });
-
-    // Profile Modal Functions
-    function openProfileModal() {
-      document.getElementById('profileModal').style.display = 'block';
-      document.getElementById('dropdownMenu').classList.remove('active');
-      
-      // Load existing data if available
-      loadProfileData();
-    }
-
-    function closeProfileModal() {
-      document.getElementById('profileModal').style.display = 'none';
-    }
-
-    function loadProfileData() {
-  const userData = JSON.parse(localStorage.getItem('userData')) || {};
-
-  document.getElementById('fullName').value = userData.fullName || '';
-  document.getElementById('yearOfStudy').value = userData.yearOfStudy || '';
-  document.getElementById('batch').value = userData.batch || '';
-  document.getElementById('department').value = userData.department || '';
-  document.getElementById('dateOfBirth').value = userData.dateOfBirth || '';
-
-  // Load profile picture
-  if (userData.profilePic) {
-    document.getElementById('profilePicPreview').src = userData.profilePic;
-    document.querySelector('.user-button img').src = userData.profilePic;
+  if (!cartItems.length) {
+    container.innerHTML = `
+      <div class="empty-cart">
+        <div class="icon">🛒</div>
+        <p style="font-size:1.1rem;font-weight:600;margin-bottom:.5rem;">Your cart is empty</p>
+        <p>Browse the menu and add items to get started.</p>
+        <a href="/" style="display:inline-block;margin-top:1rem;color:var(--brand);">← Back to Home</a>
+      </div>`;
+    panel.style.display = 'none';
+    return;
   }
 
-  if (userData.fullName) {
-    document.getElementById('userName').textContent = userData.fullName;
-  }
+  let subtotal = 0;
+  const rows = cartItems.map((item, i) => {
+    const tot = item.price * item.qty;
+    subtotal += tot;
+    return `
+      <tr>
+        <td>
+          <div class="item-cell">
+            <img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'">
+            <span class="item-name">${item.name}</span>
+          </div>
+        </td>
+        <td class="price-cell">₹${item.price}</td>
+        <td>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="changeQty(${i}, -1)">−</button>
+            <span class="qty-value">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${i}, 1)">+</button>
+          </div>
+        </td>
+        <td class="price-cell">₹${tot}</td>
+        <td><button class="remove-btn" onclick="removeItem(${i})">🗑</button></td>
+      </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <table class="cart-table">
+      <thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Subtotal</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  panel.style.display = 'block';
+  applyDiscount(subtotal);
+  updateNavCartBadge();
 }
 
+function applyDiscount(subtotal) {
+  const code = document.getElementById('coupon')?.value?.trim().toUpperCase();
+  discountAmount = code === 'LICET5' ? Math.round(subtotal * 0.05) : 0;
+  const total = subtotal - discountAmount;
+  document.getElementById('subtotal').textContent = subtotal;
+  document.getElementById('discount').textContent = discountAmount;
+  document.getElementById('total').textContent    = total;
+}
 
-    function handleProfilePicChange(event) {
-      const file = event.target.files[0];
-      if (file) {
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
-          alert('Please select a valid image file.');
-          return;
-        }
-        
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-          alert('Please select an image smaller than 5MB.');
-          return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const imageDataUrl = e.target.result;
-          document.getElementById('profilePicPreview').src = imageDataUrl;
-          
-          // Store the image data temporarily
-          window.tempProfilePic = imageDataUrl;
-        };
-        reader.readAsDataURL(file);
-      }
+function applyCoupon() {
+  const subtotal = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
+  applyDiscount(subtotal);
+}
+
+function changeQty(idx, delta) {
+  const cart = getCart();
+  cart[idx].qty = Math.max(1, cart[idx].qty + delta);
+  saveCart(cart);
+  renderCart();
+}
+
+function removeItem(idx) {
+  const cart = getCart();
+  cart.splice(idx, 1);
+  saveCart(cart);
+  renderCart();
+}
+
+// ── Chips ─────────────────────────────────────────────────────────────────────
+function initChips(containerId, onSelect) {
+  document.getElementById(containerId).addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll(`#${containerId} .chip`).forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    onSelect(chip.dataset.value);
+  });
+}
+
+// ── Place Order (POST to Django) ──────────────────────────────────────────────
+function placeOrder() {
+  const btn = document.getElementById('checkoutBtn');
+  btn.disabled = true;
+  btn.textContent = 'Placing Order…';
+
+  const date     = document.getElementById('order-date').value;
+  const payload  = {
+    items:       cartItems.map(i => ({ id: i.id, qty: i.qty })),
+    pickup_time: selectedTime,
+    order_type:  selectedType,
+    date:        date,
+  };
+
+  fetch("{% url 'checkout_order' %}", {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body:    JSON.stringify(payload),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === 'success') {
+      showReceipt(data.order_ref, date);
+      saveCart([]);          // clear cart ONLY after server confirms
+      updateNavCartBadge();
+    } else {
+      alert('Order failed: ' + (data.message || 'Unknown error'));
     }
+  })
+  .catch(() => alert('Network error – please try again.'))
+  .finally(() => { btn.disabled = false; btn.textContent = '✅ Place Order'; });
+}
 
-    function removeProfilePic() {
-      // Reset to default profile picture
-      const defaultPic = 'Images/Landing Page/User-Logo.png';
-      document.getElementById('profilePicPreview').src = defaultPic;
-      document.getElementById('profilePicInput').value = '';
-      window.tempProfilePic = null;
-    }
+// ── Receipt ───────────────────────────────────────────────────────────────────
+function showReceipt(orderRef, date) {
+  const total = parseInt(document.getElementById('total').textContent);
+  const names = cartItems.map(i => `${i.name} x${i.qty}`).join(', ');
 
-    function saveProfile() {
-      const formData = {
-        fullName: document.getElementById('fullName').value,
-        yearOfStudy: document.getElementById('yearOfStudy').value,
-        batch: document.getElementById('batch').value,
-        department: document.getElementById('department').value,
-        dateOfBirth: document.getElementById('dateOfBirth').value,
-        profilePic: window.tempProfilePic || window.userData?.profilePic || 'Images/Landing Page/User-Logo.png'
-      };
+  document.getElementById('r-ref').textContent    = orderRef;
+  document.getElementById('r-items').textContent  = names;
+  document.getElementById('r-pickup').textContent = `${date} at ${selectedTime}`;
+  document.getElementById('r-type').textContent   = selectedType;
+  document.getElementById('r-total').textContent  = total;
 
-      // Save to memory (in a real app, this would be sent to a server)
-      localStorage.setItem('userData', JSON.stringify(formData));
+  // QR Code
+  const qrDiv = document.getElementById('receiptQR');
+  qrDiv.innerHTML = '';
+  QRCode.toCanvas(document.createElement('canvas'),
+    `LICET Cafeteria\nRef: ${orderRef}\nItems: ${names}\nPickup: ${date} ${selectedTime}\nType: ${selectedType}\nTotal: ₹${total}`,
+    { width: 160, color: { dark: '#f97316', light: '#1a1a1a' } },
+    (err, canvas) => { if (!err) qrDiv.appendChild(canvas); }
+  );
 
-      
-      // Update the display name
-      if (formData.fullName) {
-        document.getElementById('userName').textContent = formData.fullName;
-      }
+  document.getElementById('receiptModal').classList.add('open');
+}
 
-      // Update the user button profile picture
-      if (formData.profilePic) {
-        document.querySelector('.user-button img').src = formData.profilePic;
-      }
+function downloadReceipt() {
+  const ref   = document.getElementById('r-ref').textContent;
+  const lines = [
+    'LICET Cafeteria – Order Receipt',
+    '================================',
+    `Order Ref : ${ref}`,
+    `Items     : ${document.getElementById('r-items').textContent}`,
+    `Pickup    : ${document.getElementById('r-pickup').textContent}`,
+    `Type      : ${document.getElementById('r-type').textContent}`,
+    `Total Paid: ₹${document.getElementById('r-total').textContent}`,
+    '================================',
+    'Thank you for your order!',
+  ].join('\n');
 
-      // Clear temporary profile pic data
-      window.tempProfilePic = null;
+  const blob = new Blob([lines], { type: 'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `${ref}.txt`; a.click();
+  URL.revokeObjectURL(url);
+}
 
-      // Show success message
-      alert('Profile updated successfully!');
-      closeProfileModal();
-    }
+function finishOrder() {
+  document.getElementById('receiptModal').classList.remove('open');
+  renderCart();   // will show empty cart
+}
 
-    function logout() {
-      const confirmLogout = confirm('Are you sure you want to logout?');
-      if (confirmLogout) {
-        // Clear user data
-        window.userData = {};
-        window.tempProfilePic = null;
-        
-        // In a real app, you would redirect to login page
-        alert('You have been logged out successfully!');
-        
-        // Reset display
-        document.getElementById('userName').textContent = 'User Name';
-        document.querySelector('.user-button img').src = 'Images/Landing Page/User-Logo.png';
-        document.getElementById('dropdownMenu').classList.remove('active');
-      }
-    }
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // default date = today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('order-date').value = today;
 
-    // Close modal when clicking outside of it
-    window.onclick = function(event) {
-      const modal = document.getElementById('profileModal');
-      if (event.target === modal) {
-        closeProfileModal();
-      }
-    }
+  initChips('time-chips', v => { selectedTime = v; });
+  initChips('type-chips', v => { selectedType = v; });
 
-    // Initialize user data storage
-    window.userData = window.userData || {};
-    document.addEventListener('DOMContentLoaded', () => {
-  loadProfileData();
+  renderCart();
 });
-
-localStorage.removeItem('cartItems');
-
-
-  </script>
-</body>
-</html>
+</script>
+{% endblock %}

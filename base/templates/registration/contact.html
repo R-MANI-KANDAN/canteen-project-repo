@@ -1,1 +1,121 @@
-contact Page
+{% extends "registration/base.html" %}
+{% load static %}
+
+{% block title %}Contact Us – LICET Cafeteria{% endblock %}
+{% block meta_description %}Get in touch with LICET Cafeteria. Find our location, hours, and send us a message.{% endblock %}
+
+{% block extra_css %}
+<style>
+  .contact-page { max-width: 860px; margin: 0 auto; padding: 2rem 1rem; }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem; }
+  @media(max-width:600px){ .contact-grid { grid-template-columns: 1fr; } }
+
+  /* Info & Form Cards - Glassmorphism */
+  .info-card, .form-card {
+    background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .info-card h2, .form-card h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; }
+  .info-row { display: flex; align-items: flex-start; gap: .75rem; margin-bottom: .85rem; }
+  .info-icon { font-size: 1.25rem; margin-top: .1rem; }
+  .info-label { font-size: .78rem; color: var(--text-muted); }
+  .info-value { font-size: .9rem; font-weight: 500; }
+
+  .contact-form { display: flex; flex-direction: column; gap: .75rem; }
+  .contact-form input, .contact-form textarea {
+    background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm); color: var(--text);
+    padding: .6rem .85rem; font-family: inherit; font-size: .875rem;
+    transition: all var(--transition);
+  }
+  .contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--brand); background: rgba(249, 115, 22, 0.05); }
+  .contact-form textarea { resize: vertical; min-height: 110px; }
+  .contact-submit {
+    background: var(--brand); color: #fff; border: none;
+    border-radius: 50px; padding: .65rem;
+    font-size: .9rem; font-weight: 600; cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: 0 4px 15px var(--brand-glow);
+  }
+  .contact-submit:hover { background: var(--brand-dark); transform: translateY(-1px); box-shadow: 0 6px 20px var(--brand-glow); }
+  .hours-table { width: 100%; font-size: .875rem; border-collapse: collapse; margin-top: .5rem; }
+  .hours-table td { padding: .35rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .hours-table tr:last-child td { border-bottom: none; }
+  .hours-table td:last-child { text-align: right; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-page">
+  <h1 class="section-heading">📬 Contact Us</h1>
+  <p style="color:var(--text-muted)">Questions, feedback, or just want to say hello? We'd love to hear from you.</p>
+
+  <div class="contact-grid">
+    <!-- Info -->
+    <div class="info-card">
+      <h2>Our Details</h2>
+      <div class="info-row">
+        <span class="info-icon">📍</span>
+        <div>
+          <div class="info-label">Address</div>
+          <div class="info-value">Loyola-ICAM College of Engineering and Technology<br>Nungambakkam, Chennai – 600 034</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">🕐</span>
+        <div>
+          <div class="info-label">Canteen Hours</div>
+          <table class="hours-table">
+            <tr><td>Mon – Fri</td><td>8:00 AM – 4:00 PM</td></tr>
+            <tr><td>Saturday</td><td>9:00 AM – 1:00 PM</td></tr>
+            <tr><td>Sunday</td><td>Closed</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">📞</span>
+        <div>
+          <div class="info-label">Phone</div>
+          <div class="info-value">+91 44 2817 1948</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">✉️</span>
+        <div>
+          <div class="info-label">Email</div>
+          <div class="info-value">canteen@licet.ac.in</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-card">
+      <h2>Send a Message</h2>
+      <form class="contact-form" onsubmit="handleContactSubmit(event)">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Your name" required>
+        <input type="email" name="email" placeholder="Your email" required>
+        <input type="text" name="subject" placeholder="Subject">
+        <textarea name="message" placeholder="Your message…" required></textarea>
+        <button type="submit" class="contact-submit">Send Message 📨</button>
+      </form>
+      <p id="contact-success" style="display:none;color:#4ade80;margin-top:.75rem;font-size:.875rem;">
+        ✅ Message sent! We'll get back to you soon.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function handleContactSubmit(e) {
+  e.preventDefault();
+  // Simulated success (no backend mailer configured)
+  e.target.style.display = 'none';
+  document.getElementById('contact-success').style.display = 'block';
+}
+</script>
+{% endblock %}

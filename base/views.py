@@ -1,68 +1,41 @@
+import json
+import datetime
 
-from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm,ProfileUpdateForm
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import Profile, Product
+from django.contrib import messages
 from django.http import JsonResponse
-import json
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 
-products = Product.objects.all()
+from .forms import CustomUserCreationForm, ProfileUpdateForm
+from .models import Profile, Product, Order
 
-@login_required
-def home(request):
-    user = request.user
-    profile, created = Profile.objects.get_or_create(user=user)
-    profile_picture = request.user.profile.profile_picture.url if request.user.profile.profile_picture else None
-    return render(request, 'registration/home.html', {'profile_picture': profile})
 
-@login_required
-def update_profile(request):
-    profile, created = Profile.objects.get_or_create(user=request.user)
-    
-    if request.method == 'POST':
-        form = ProfileUpdateForm(
-            request.POST, 
-            request.FILES, 
-            instance=profile
-        )
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    else:
-        form = ProfileUpdateForm(instance=profile)
-    
-    return render(request, 'registration/update_profile.html', {'form': form})
-
+# ─── Authentication ────────────────────────────────────────────────────────────
 
 def authView(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
+        email    = request.POST.get('email', '').strip()
+        password1 = request.POST.get('password1', '')
+        password2 = request.POST.get('password2', '')
+
+        if User.objects.filter(username=email).exists():
+            messages.error(request, 'A user with this email already exists.')
+            return render(request, 'registration/signup.html', {'form': form})
+
+        if password1 != password2:
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'registration/signup.html', {'form': form})
+
         if form.is_valid():
-            email = request.POST['email']
-            password1 = request.POST['password1']
-            password2 = request.POST.get('password2')
-
-            # Check if a user with the same email already exists
-            if User.objects.filter(username=email).exists():
-                messages.error(request, 'A user with this email already exists. Please use a different email.')
-                return render(request, 'registration/signup.html', {'form': form})  # Return to signup page with error
-
-            # Check if passwords match
-            if password1 != password2:
-                messages.error(request, 'Passwords do not match.')
-                return render(request, 'registration/signup.html', {'form': form})  # Return to signup page with error
-
-            # Create the user
             user = User.objects.create_user(username=email, email=email, password=password1)
-
-            # Create a profile for the new user
             Profile.objects.get_or_create(user=user)
-
-            messages.success(request, 'Account created successfully! Please log in.')
-            return redirect('login')  # Redirect to login page after successful signup
+            messages.success(request, 'Account created! Please log in.')
+            return redirect('login')
     else:
         form = CustomUserCreationForm()
 
@@ -71,99 +44,220 @@ def authView(request):
 
 def custom_login(request):
     if request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
-        
-        # Authenticate the user
+        email    = request.POST.get('email', '')
+        password = request.POST.get('password', '')
         user = authenticate(request, username=email, password=password)
-        
         if user is not None:
-            # Log the user in
             login(request, user)
-            return redirect('home')  # Redirect to the home page after successful login
-        else:
-            # Display an error message if authentication fails
-            messages.error(request, 'Invalid email or password.')
-            return redirect('login')  # Redirect back to the login page
-    else:
-        return render(request, 'registration/login.html')
+            return redirect('home')
+        messages.error(request, 'Invalid email or password.')
+        return redirect('login')
+    return render(request, 'registration/login.html')
+
 
 def custom_logout(request):
-    logout(request)  # This clears the session
-    return redirect('login')  # Redirect to the login page (URL name must be 'login')
-
-def ready_to_grab(request):
-    return render(request, 'registration/ready_to_grab.html',{'products':products})
-
-def cooked_to_serve(request):
-    products = Product.objects.filter(category__name='Cooked to Serve')
-    return render(request, 'registration/cooked_to_serve.html',{'products':products})
-
-def beverages(request):
-    return render(request, 'registration/beverages.html',{'products':products})
-
-def menu(request):
-    # Initialize cart count from session
-    cart_count = sum(request.session.get('cart', {}).values())
-    return render(request, 'menu.html', {'cart_count': cart_count})
+    logout(request)
+    return redirect('login')
 
 
+# ─── Home & Profile ────────────────────────────────────────────────────────────
 
-def add_to_cart(request):
+@login_required
+def home(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    return render(request, 'registration/home.html', {'profile': profile})
+
+
+@login_required
+def update_profile(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
-        data = json.loads(request.body)
-        item_id = data.get('item_id')
-        
-        # Get or initialize cart in session
-        cart = request.session.get('cart', {})
-        cart[item_id] = cart.get(item_id, 0) + 1
-        
-        # Save updated cart to session
-        request.session['cart'] = cart
-        return JsonResponse({
-            'status': 'success',
-            'cart_count': sum(cart.values())
-        })
-    return JsonResponse({'status': 'error'}, status=400)
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('home')
+    else:
+        form = ProfileUpdateForm(instance=profile)
+    return render(request, 'registration/update_profile.html', {'form': form})
 
-def cart_2(request):
-    cart = request.session.get('cart', {})
-    cart_items = []
-    
-    # Sample item database (replace with your actual model)
-    ITEM_DB = {
-        '1': {'name': 'Veg Meals', 'price': 80},
-        '2': {'name': 'Sambar Rice', 'price': 70},
-        # Add all other items similarly...
-    }
-    
-    total = 0
-    for item_id, quantity in cart.items():
-        item = ITEM_DB.get(item_id)
-        if item:
-            item_total = item['price'] * quantity
-            cart_items.append({
-                'id': item_id,
-                'name': item['name'],
-                'price': item['price'],
-                'quantity': quantity,
-                'total': item_total
-            })
-            total += item_total
-    
-    return render(request, 'cart.html', {
-        'cart_items': cart_items,
-        'subtotal': total,
-        'discount': total * 0.05,
-        'total': total * 0.95
+
+@login_required
+@require_POST
+def update_profile_ajax(request):
+    """AJAX endpoint – saves student profile details to the database."""
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+
+    # Text fields
+    profile.year_of_study = request.POST.get('yearOfStudy', profile.year_of_study)
+    profile.batch         = request.POST.get('batch', profile.batch)
+    profile.department    = request.POST.get('department', profile.department)
+
+    dob = request.POST.get('dateOfBirth', '')
+    if dob:
+        try:
+            profile.date_of_birth = datetime.date.fromisoformat(dob)
+        except ValueError:
+            pass
+
+    # Full name → split into first_name / last_name on the User model
+    full_name = request.POST.get('fullName', '').strip()
+    if full_name:
+        parts = full_name.split(' ', 1)
+        request.user.first_name = parts[0]
+        request.user.last_name  = parts[1] if len(parts) > 1 else ''
+        request.user.save()
+
+    # Profile picture
+    if 'profilePic' in request.FILES:
+        profile.profile_picture = request.FILES['profilePic']
+
+    profile.save()
+
+    return JsonResponse({
+        'status': 'success',
+        'fullName': f"{request.user.first_name} {request.user.last_name}".strip(),
+        'profilePicUrl': profile.profile_picture.url if profile.profile_picture else '',
     })
 
 
-def snacks(request):
-    return render(request, 'registration/snacks.html',{'products':products})
+# ─── Menu Pages ───────────────────────────────────────────────────────────────
 
+@login_required
+def ready_to_grab(request):
+    products = (Product.objects
+                .filter(category__name__iexact='ready to grab', is_sale=True)
+                .select_related('category')
+                .order_by('sub_category', 'name'))
+    return render(request, 'registration/ready_to_grab.html', {'products': products})
+
+
+@login_required
+def cooked_to_serve(request):
+    products = (Product.objects
+                .filter(category__name__iexact='cook to serve', is_sale=True)
+                .select_related('category')
+                .order_by('sub_category', 'name'))
+    return render(request, 'registration/cooked_to_serve.html', {'products': products})
+
+
+@login_required
+def beverages(request):
+    products = (Product.objects
+                .filter(category__name__iexact='beverages', is_sale=True)
+                .select_related('category')
+                .order_by('sub_category', 'name'))
+    return render(request, 'registration/beverages.html', {'products': products})
+
+
+@login_required
+def snacks(request):
+    products = (Product.objects
+                .filter(category__name__iexact='snacks', is_sale=True)
+                .select_related('category')
+                .order_by('sub_category', 'name'))
+    return render(request, 'registration/snacks.html', {'products': products})
+
+
+@login_required
 def sidedish(request):
-    return render(request, 'registration/sidedish.html',{'products':products})
+    products = (Product.objects
+                .filter(category__name__iexact='side dishes', is_sale=True)
+                .select_related('category')
+                .order_by('sub_category', 'name'))
+    return render(request, 'registration/sidedish.html', {'products': products})
+
 
 def contact(request):
     return render(request, 'registration/contact.html')
+
+
+# ─── Checkout ─────────────────────────────────────────────────────────────────
+
+@login_required
+@require_POST
+def checkout_order(request):
+    """
+    Accepts JSON cart payload from the frontend, creates Order rows in the DB,
+    and returns a real order reference number.
+
+    Expected JSON body:
+    {
+        "items":      [{"id": 1, "qty": 2}, ...],
+        "pickup_time": "12:45",
+        "order_type":  "Dine In",
+        "date":        "2025-06-22"
+    }
+    """
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+    items       = data.get('items', [])
+    pickup_time = data.get('pickup_time', '')
+    order_type  = data.get('order_type', 'Dine In')
+    date_str    = data.get('date', '')
+
+    if not items:
+        return JsonResponse({'status': 'error', 'message': 'Cart is empty'}, status=400)
+
+    try:
+        order_date = datetime.date.fromisoformat(date_str)
+    except (ValueError, TypeError):
+        order_date = datetime.date.today()
+
+    created_orders = []
+    for item in items:
+        product = get_object_or_404(Product, pk=item.get('id'))
+        order = Order.objects.create(
+            product     = product,
+            customer    = request.user,
+            quantity    = int(item.get('qty', 1)),
+            pickup_time = pickup_time,
+            order_type  = order_type,
+            date        = order_date,
+            student_id  = request.user.username,
+        )
+        created_orders.append(order.order_id)
+
+    # Return the first order_id as the receipt reference
+    return JsonResponse({
+        'status':   'success',
+        'order_ids': created_orders,
+        'order_ref': f"LCT-{created_orders[0]:04d}",
+    })
+
+
+# ─── Kitchen Dashboard ────────────────────────────────────────────────────────
+
+@login_required
+def kitchen_dashboard(request):
+    if not request.user.is_staff:
+        messages.error(request, 'Access denied. Staff only.')
+        return redirect('home')
+
+    pending   = (Order.objects.filter(status=False)
+                 .select_related('product', 'customer')
+                 .order_by('date', 'pickup_time'))
+    completed = (Order.objects.filter(status=True)
+                 .select_related('product', 'customer')
+                 .order_by('-date', '-pickup_time')[:20])
+
+    return render(request, 'registration/kitchen_dashboard.html', {
+        'pending':   pending,
+        'completed': completed,
+    })
+
+
+@login_required
+@require_POST
+def toggle_order_status(request, order_id):
+    """Kitchen staff can mark orders as done."""
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
+
+    order = get_object_or_404(Order, pk=order_id)
+    order.status = not order.status
+    order.save()
+    return JsonResponse({'status': 'success', 'done': order.status})

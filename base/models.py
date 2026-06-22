@@ -54,19 +54,20 @@ class Customer(models.Model):
 
 class Order(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)  
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
     
     quantity = models.IntegerField(default=1)  
     
     order_id = models.AutoField(primary_key=True)  # Auto-generated order number
-    student_id = models.CharField(max_length=20)  # Use CharField to support alphanumeric reg. no.
+    student_id = models.CharField(max_length=20, blank=True)  # Use CharField to support alphanumeric reg. no.
+    pickup_time = models.CharField(max_length=10, blank=True, null=True)  # e.g., "12:45"
+    order_type = models.CharField(max_length=20, blank=True, null=True)  # e.g., "Dine In", "Takeaway"
 
     status = models.BooleanField(default=False)
     date = models.DateField(default=datetime.date.today)
 
     def __str__(self):
-        return self.product
-
+        return f"Order {self.order_id} - {self.product.name} ({self.quantity})"
 
 
 
@@ -82,6 +83,10 @@ class Profile(models.Model):
         null=True
     )
     phone_number = models.CharField(max_length=20, blank=True)
+    year_of_study = models.CharField(max_length=20, blank=True)
+    batch = models.CharField(max_length=20, blank=True)
+    department = models.CharField(max_length=100, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
     
     def remove_profile_picture(self):
         """Remove the current profile picture and reset to default"""

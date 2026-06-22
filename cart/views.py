@@ -1,7 +1,6 @@
 from django.shortcuts import render,get_object_or_404
 from .cart import Cart 
-#the product model has not been created 
-#from base.models import product
+from base.models import Product
 from django.http import JsonResponse
 
 # Create your views here.
@@ -18,7 +17,7 @@ def cart_add(request):
             # lookup product in DB
             product = get_object_or_404 (Product, id=product_id)
             # Save to session
-            cart.add(product-product)
+            cart.add(product=product)
 
             response = JsonResponse({'Product Name' : product.name})
             return response

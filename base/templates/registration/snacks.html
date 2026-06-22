@@ -1,282 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% load static %}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LICET Cafeteria: Snacks</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'accounts/snacks.css' %}">
-</head>
-<body>
-    <!-- Hamburger Menu -->
-    <div class="hamburger-menu" onclick="toggleSidebar()">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-    </div>
+{% extends "registration/base.html" %}
+{% load static %}
 
-    <!-- Navigation of Side Bar-->
-    <nav class="sidebar" id="sidebar">
-    <a href="{% url 'home' %}">Home</a>
-    <a href="{% url 'cart_summary' %}">Cart</a>
-    <a href="{% url 'contact' %}">Contact</a> <!-- or use mailto or a contact section -->
-    </nav>
+{% block body_class %}page-snacks{% endblock %}
 
-    <!-- User Button -->
-    <div class="user-button">
-    <img id="profilePic" src="Images/Ready-To-Grab/User-Logo.png" alt="User Profile">
-    <span class="user-info" id="profileName">User Name</span>
-    </div>
+{% block title %}Snacks – LICET Cafeteria{% endblock %}
+{% block meta_description %}Quick bites and snacks at LICET Cafeteria.{% endblock %}
 
+{% block content %}
+<div class="page-wrapper">
+  <h1 class="section-heading">🍿 Snacks</h1>
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;">Quick bites to keep you going!</p>
 
-    <!-- Sidebar Navigation -->
-    <nav class="sidebar" id="sidebar">
-        <a href="#">Home</a>
-        <a href="#">Menu</a>
-        <a href="#">Cart</a>
-        <a href="#">Contact</a>
-    </nav>
-
-    <!-- Header Section -->
-    <div class="header-logo">
-        <img src="Images/Snacks/licet_logo.png" alt="LICET Cafeteria Logo">
-        <h1>LICET Cafeteria</h1>
-    </div>
-    
-    <!-- Added Beverage Menu Heading -->
-    <h1 class="menu-heading">Snacks Menu</h1>
-
-    <div class="container">
-        <!-- Puff Pastry -->
-        <section class="category-section hot-beverages">
-            <div class="category-header">
-                <h2>Puff Pastry</h2>
+  {% if products %}
+    {% regroup products by sub_category as category_list %}
+    {% for group in category_list %}
+      {% if group.grouper %}
+        <h2 class="section-heading" style="font-size:1.1rem;">{{ group.grouper|title }}</h2>
+      {% endif %}
+      <div class="product-grid">
+        {% for product in group.list %}
+        <div class="product-card">
+          <img src="{{ product.image.url }}" alt="{{ product.name }}"
+               onerror="this.src='{% static 'accounts/placeholder.png' %}'">
+          <div class="product-card-body">
+            <div class="product-card-name">{{ product.name|title }}</div>
+            <div class="product-card-footer">
+              <span class="product-price">₹{{ product.price|floatformat:0 }}</span>
+              <button class="add-to-cart-btn"
+                onclick="handleAddToCart(this, {{ product.id }}, '{{ product.name|title }}', {{ product.price }}, '{{ product.image.url }}')">
+                Add
+              </button>
             </div>
-            <div class="scroll-container">
-                <div class="beverage-card">
-                    <img src="Images/Snacks/chicken puff.jpg" class="beverage-image" alt="Masala Chai">
-                    <h3>Chicken Puff</h3>
-                    <p>Non-veg</p>
-                    <div class="price-tag">₹25</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/veg-puff.jpg" class="beverage-image" alt="Filter Coffee">
-                    <h3>Veg Puff</h3>
-                    <p>Veg</p>
-                    <div class="price-tag">₹20</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/paneer-puff.jpg" class="beverage-image" alt="Hot Chocolate">
-                    <h3>Paneer Puff</h3>
-                    <p>Veg</p>
-                    <div class="price-tag">₹25</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/egg-puff.jpg" class="beverage-image" alt="Green Tea">
-                    <h3>Egg Puff</h3>
-                    <p>Non-veg</p>
-                    <div class="price-tag">₹20</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/small-samosa.jpg" class="beverage-image" alt="Cappuccino">
-                    <h3>Small Samosa's</h3>
-                    <p>Veg</p>
-                    <div class="price-tag">₹50</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/Samosa.jpg" class="beverage-image" alt="Turmeric Tea">
-                    <h3>Samosa</h3>
-                    <p>Veg</p>
-                    <div class="price-tag">₹20</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Specials -->
-        <section class="category-section cold-beverages">
-            <div class="category-header">
-                <h2>Specials</h2>
-            </div>
-            <div class="scroll-container">
-                <div class="beverage-card">
-                    <img src="Images/Snacks/plain-maggie.jpeg" class="beverage-image" alt="Lemonade">
-                    <h3>Plain Maggie</h3>
-                    <p>Veg</p>
-                    <div class="price-tag">₹40</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/cheese-maggie.jpg" class="beverage-image" alt="Iced Coffee">
-                    <h3>Cheese Maggie</h3>
-                    <p>Veg</p>
-                    <div class="price-tag">₹55</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/Bread-omelette.jpg" class="beverage-image" alt="Milkshake">
-                    <h3>Bread Omelette</h3>
-                    <p>Non-Veg</p>
-                    <div class="price-tag">₹60</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/cheese-Bread-Omelette.jpg" class="beverage-image" alt="Soda">
-                    <h3>Cheese Bread Omellete</h3>
-                    <p>Non-Veg</p>
-                    <div class="price-tag">₹30</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/cut-lets.jpg" class="beverage-image" alt="Smoothie">
-                    <h3>Cutlet</h3>
-                    <p>Veg</p>
-                    <div class="price-tag">₹65</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/Roll-cutlet.jpg" class="beverage-image" alt="Iced Tea">
-                    <h3>Roll Cutlet</h3>
-                    <p>Veg</p>
-                    <div class="price-tag">₹35</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sweets -->
-        <section class="category-section healthy-choices">
-            <div class="category-header">
-                <h2>Sweets</h2>
-            </div>
-            <div class="scroll-container">
-                <div class="beverage-card">
-                    <img src="Images/Snacks/Brownie.jpg" class="beverage-image" alt="Detox Juice">
-                    <h3>Brownie</h3>
-                    <p>Fudgy, chocolaty</p>
-                    <div class="price-tag">₹30</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/oreo.jpg" class="beverage-image" alt="Coconut Water">
-                    <h3>Oreo</h3>
-                    <p>Creamy, crunchy, classic</p>
-                    <div class="price-tag">₹10</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/lotte-choco-pie.jpg" class="beverage-image" alt="Almond Milk">
-                    <h3>lotte-choco-pie</h3>
-                    <p>Soft, marshmallowy</p>
-                    <div class="price-tag">₹10</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/hersheys.jpg" class="beverage-image" alt="Vegetable Juice">
-                    <h3>Hershey's Chocolate</h3>
-                    <p>Rich, smooth, indulgent</p>
-                    <div class="price-tag">₹10</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/wafer-roll.jpg" class="beverage-image" alt="Herbal Tea">
-                    <h3>wafer-roll</h3>
-                    <p>Crispy, creamy, light</p>
-                    <div class="price-tag">₹40</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Snacks/Candy.jpg" class="beverage-image" alt="Protein Shake">
-                    <h3>Candy</h3>
-                    <p>Sweet, colorful, chewy</p>
-                    <div class="price-tag">₹75</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-            </div>
-        </section>
-
-            <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2025 LICET Cafeteria. All rights reserved.</p>
-        <div class="social-links">
-        <a href="#" aria-label="Facebook"><img src="Images/Landing Page/facebook.jpg" alt="Facebook"></a>
-        <a href="#" aria-label="Instagram"><img src="Images/Landing Page/instagram.jpg" alt="Instagram"></a>
-        <a href="#" aria-label="Twitter"><img src="Images/Landing Page/X.png" alt="Twitter"></a>
+          </div>
         </div>
-    </footer>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:var(--text-muted);padding:2rem 0;">No items available right now. Check back soon!</p>
+  {% endif %}
+</div>
+{% endblock %}
 
-    <button class="cart-button" data-url="{% url 'cart_summary' %}" onclick="window.location.href=this.dataset.url">
-        🛒 Cart (<span id="cart-count">0</span>)
-    </button>
-    </div>
-
+{% block extra_js %}
 <script>
-  function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('active');
-  }
-
-  document.addEventListener('click', function(event) {
-    const sidebar = document.getElementById('sidebar');
-    const hamburger = document.querySelector('.hamburger-menu');
-    if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
-      sidebar.classList.remove('active');
-    }
-  });
-
-  // ---------------- CART SYSTEM ----------------
-
-  const cartElement = document.getElementById('cart-count');
-
-  function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
-    const total = cart.reduce((sum, item) => sum + item.qty, 0);
-    cartElement.textContent = total;
-  }
-
-  function addToCart(item) {
-    let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
-
-    const existingIndex = cart.findIndex(i => i.name === item.name);
-    if (existingIndex !== -1) {
-      cart[existingIndex].qty += 1;
-    } else {
-      cart.push({ ...item, qty: 1 });
-    }
-
-    localStorage.setItem('cartItems', JSON.stringify(cart));
-    updateCartCount();
-  }
-
-  // Attach to all buttons
-  document.querySelectorAll('.order-btn').forEach(button => {
-    button.addEventListener('click', () => {
-      const card = button.closest('.beverage-card');
-      const name = card.querySelector('h3').textContent;
-      const price = parseInt(card.querySelector('.price-tag').textContent.replace('₹', ''));
-      const img = card.querySelector('img').src;
-
-      addToCart({ name, price, img });
-    });
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    updateCartCount();
-
-    const data = JSON.parse(localStorage.getItem('userData')) || {};
-    if (data.fullName) {
-      document.getElementById('profileName').textContent = data.fullName;
-    }
-    if (data.profilePic) {
-      document.getElementById('profilePic').src = data.profilePic;
-    }
-  });
+function handleAddToCart(btn, id, name, price, img) {
+  addToCart(id, name, price, img);
+  btn.textContent = '✓ Added';
+  btn.classList.add('added');
+  setTimeout(() => { btn.textContent = 'Add'; btn.classList.remove('added'); }, 1500);
+}
 </script>
-
-</body>
-</html>
+{% endblock %}

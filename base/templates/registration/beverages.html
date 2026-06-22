@@ -1,384 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% load static %}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LICET Cafeteria: Beverages</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'accounts/beverages_styles.css' %}">
-</head>
-<body>
-    <!-- Hamburger Menu -->
-    <div class="hamburger-menu" onclick="toggleSidebar()">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-    </div>
+{% extends "registration/base.html" %}
+{% load static %}
 
-    <!-- Navigation of Side Bar-->
-  <nav class="sidebar" id="sidebar">
-  <a href="0.Landing Page.html">Home</a>
-  <a href="0.Landing Page.html">Menu</a> <!-- change filename as needed -->
-  <a href="6.Cart.html">Cart</a>
-  <a href="Contact.html">Contact</a> <!-- or use mailto or a contact section -->
-  </nav>
+{% block body_class %}page-beverages{% endblock %}
 
-    <!-- User Button -->
-    <div class="user-button">
-    <img id="profilePic" src="Images/Ready-To-Grab/User-Logo.png" alt="User Profile">
-    <span class="user-info" id="profileName">User Name</span>
-    </div>
+{% block title %}Beverages – LICET Cafeteria{% endblock %}
+{% block meta_description %}Fresh juices, cool drinks and milkshakes at LICET Cafeteria.{% endblock %}
 
+{% block content %}
+<div class="page-wrapper">
+  <h1 class="section-heading">🥤 Beverages</h1>
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;">Fresh juices, cool drinks, and more!</p>
 
-    <nav class="sidebar" id="sidebar">
-    <a href="{% url 'home' %}">Home</a>
-    <a href="{% url 'cart_summary' %}">Cart</a>
-    <a href="{% url 'contact' %}">Contact</a> <!-- or use mailto or a contact section -->
-    </nav>
-
-    <!-- Header Section -->
-    <div class="header-logo">
-        <img src="Images/Beverages/licet_logo.png" alt="LICET Cafeteria Logo">
-        <h1>LICET Cafeteria</h1>
-    </div>
-    
-    <!-- Added Beverage Menu Heading -->
-    <h1 class="menu-heading">Beverage Menu</h1>
-
-    <div class="container">
-    <!-- Milkshakes & Special Drinks -->
-        <section class="category-section hot-beverages">
-        <div class="category-header">
-            <h2>Milkshakes & Specials</h2>
+  {% if products %}
+    {% regroup products by sub_category as category_list %}
+    {% for group in category_list %}
+      {% if group.grouper %}
+        <h2 class="section-heading" style="font-size:1.1rem;">{{ group.grouper|title }}</h2>
+      {% endif %}
+      <div class="product-grid">
+        {% for product in group.list %}
+        <div class="product-card">
+          <img src="{{ product.image.url }}" alt="{{ product.name }}"
+               onerror="this.src='{% static 'accounts/placeholder.png' %}'">
+          <div class="product-card-body">
+            <div class="product-card-name">{{ product.name|title }}</div>
+            <div class="product-card-footer">
+              <span class="product-price">₹{{ product.price|floatformat:0 }}</span>
+              <button class="add-to-cart-btn"
+                onclick="handleAddToCart(this, {{ product.id }}, '{{ product.name|title }}', {{ product.price }}, '{{ product.image.url }}')">
+                Add
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="scroll-container">
-            <div class="beverage-card">
-            <img src="Images/Beverages/rose-milk.jpg" class="beverage-image" alt="Rose Milk">
-            <h3>Rose Milk</h3>
-            <p>Floral chill</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            <div class="beverage-card">
-            <img src="Images/Beverages/badam.jpg" class="beverage-image" alt="Badam">
-            <h3>Badam</h3>
-            <p>Nutty milk</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            <div class="beverage-card">
-            <img src="Images/Beverages/strawberry.jpg" class="beverage-image" alt="Strawberry">
-            <h3>Strawberry</h3>
-            <p>Sweet shake</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            <div class="beverage-card">
-            <img src="Images/Beverages/lassi.jpg" class="beverage-image" alt="Lassi">
-            <h3>Lassi</h3>
-            <p>Churned curd</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            <div class="beverage-card">
-            <img src="Images/Beverages/choco-milk.jpg" class="beverage-image" alt="Choco Milk">
-            <h3>Choco Milk</h3>
-            <p>Chocolatey drink</p>
-            <div class="price-tag">₹50</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            <div class="beverage-card">
-            <img src="Images/Beverages/dates.jpg" class="beverage-image" alt="Dates Shake">
-            <h3>Dates Shake</h3>
-            <p>Natural sweet</p>
-            <div class="price-tag">₹50</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-        </div>
-        </section>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:var(--text-muted);padding:2rem 0;">No items available right now. Check back soon!</p>
+  {% endif %}
+</div>
+{% endblock %}
 
-        <!-- Fresh Juices -->
-        <section class="category-section cold-beverages">
-        <div class="category-header">
-            <h2>Fresh Juices</h2>
-        </div>
-        <div class="scroll-container">
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/lemon.jpg" class="beverage-image" alt="Lemon Juice">
-            <h3>Lemon Juice</h3>
-            <p>Cool citrus</p>
-            <div class="price-tag">₹20</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/watermelon.jpg" class="beverage-image" alt="Watermelon Juice">
-            <h3>Watermelon</h3>
-            <p>Fresh & light</p>
-            <div class="price-tag">₹30</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/musk-melon.jpg" class="beverage-image" alt="Musk Melon">
-            <h3>Musk Melon</h3>
-            <p>Melon chill</p>
-            <div class="price-tag">₹30</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            
-            <div class="beverage-card">
-            <img src="Images/Beverages/carrot.jpg" class="beverage-image" alt="Carrot Juice">
-            <h3>Carrot Juice</h3>
-            <p>Rich in A</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/beetroot.jpg" class="beverage-image" alt="Beet Root">
-            <h3>Beet Root</h3>
-            <p>Iron boost</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/apple.jpg" class="beverage-image" alt="Apple Juice">
-            <h3>Apple Juice</h3>
-            <p>Sweet pulp</p>
-            <div class="price-tag">₹45</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            
-            <div class="beverage-card">
-            <img src="Images/Beverages/pineapple.jpg" class="beverage-image" alt="Pineapple Juice">
-            <h3>Pineapple</h3>
-            <p>Tropical burst</p>
-            <div class="price-tag">₹45</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/grape.jpg" class="beverage-image" alt="Grape Juice">
-            <h3>Grape Juice</h3>
-            <p>Sweet punch</p>
-            <div class="price-tag">₹45</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            
-            <div class="beverage-card">
-            <img src="Images/Beverages/sweetlime.jpg" class="beverage-image" alt="Sweet Lime">
-            <h3>Sweet Lime</h3>
-            <p>Mild citrus</p>
-            <div class="price-tag">₹45</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/pomegranate.jpg" class="beverage-image" alt="Pomegranate">
-            <h3>Pomegranate</h3>
-            <p>Red & rich</p>
-            <div class="price-tag">₹50</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            
-            <div class="beverage-card">
-            <img src="Images/Beverages/fig.jpg" class="beverage-image" alt="Fig Juice">
-            <h3>Fig Juice</h3>
-            <p>Unique taste</p>
-            <div class="price-tag">₹60</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            
-            <div class="beverage-card">
-            <img src="Images/Beverages/abc.jpg" class="beverage-image" alt="A-B-C Juice">
-            <h3>A-B-C Juice</h3>
-            <p>Apple beet carrot</p>
-            <div class="price-tag">₹45</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            
-            <div class="beverage-card">
-            <img src="Images/Beverages/orange.jpg" class="beverage-image" alt="Orange Juice">
-            <h3>Orange Juice</h3>
-            <p>Vitamin C</p>
-            <div class="price-tag">₹45</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            
-            <div class="beverage-card">
-            <img src="Images/Beverages/grape-lemon.jpg" class="beverage-image" alt="Grape Lemon">
-            <h3>Grape Lemon</h3>
-            <p>Tangy mix</p>
-            <div class="price-tag">₹30</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-            
-            <div class="beverage-card">
-            <img src="Images/Beverages/pineapple-lemon.jpg" class="beverage-image" alt="Pineapple Lemon">
-            <h3>Pineapple Lemon</h3>
-            <p>Zesty chill</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-        </div>
-        </section>
-
-
-
-        <!-- Cool Bottled Drinks -->
-        <section class="category-section healthy-choices">
-        <div class="category-header">
-            <h2>Cool Drinks</h2>
-        </div>
-        <div class="scroll-container">
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/cavins-milkshake.jpg" class="beverage-image" alt="Cavin’s Shake">
-            <h3>Cavin’s Shake</h3>
-            <p>Bottle shake</p>
-            <div class="price-tag">₹40</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/goli-soda.jpg" class="beverage-image" alt="Goli Soda">
-            <h3>Goli Soda</h3>
-            <p>Fizz pop</p>
-            <div class="price-tag">₹25</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/maaza.jpg" class="beverage-image" alt="Maaza">
-            <h3>Maaza</h3>
-            <p>Mango pulp</p>
-            <div class="price-tag">₹20</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/mountain-dew.jpg" class="beverage-image" alt="Mountain Dew">
-            <h3>Mountain Dew</h3>
-            <p>Lime blast</p>
-            <div class="price-tag">₹19</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/7up.jpg" class="beverage-image" alt="7 UP">
-            <h3>7 UP</h3>
-            <p>Lime soda</p>
-            <div class="price-tag">₹15</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/mirinda.jpg" class="beverage-image" alt="Mirinda">
-            <h3>Mirinda</h3>
-            <p>Orange fizz</p>
-            <div class="price-tag">₹15</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/slice.jpg" class="beverage-image" alt="Slice">
-            <h3>Slice</h3>
-            <p>Mango drink</p>
-            <div class="price-tag">₹15</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-            <div class="beverage-card">
-            <img src="Images/Beverages/cone-icecream.jpg" class="beverage-image" alt="Cone Ice Cream">
-            <h3>Cone Ice Cream</h3>
-            <p>Frozen cone</p>
-            <div class="price-tag">₹25</div>
-            <button class="order-btn">Add to Cart</button>
-            </div>
-
-        </div>
-        </section>
-
-
-        <button class="cart-button" onclick="window.location.href='6.Cart.html'">🛒 Cart (<span id="cart-count">0</span>)</button>
-    </div>
-
-        <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2025 LICET Cafeteria. All rights reserved.</p>
-        <div class="social-links">
-        <a href="#" aria-label="Facebook"><img src="Images/Landing Page/facebook.jpg" alt="Facebook"></a>
-        <a href="#" aria-label="Instagram"><img src="Images/Landing Page/instagram.jpg" alt="Instagram"></a>
-        <a href="#" aria-label="Twitter"><img src="Images/Landing Page/X.png" alt="Twitter"></a>
-        </div>
-    </footer>
-
-    <script>
-  function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('active');
-  }
-
-  document.addEventListener('click', function(event) {
-    const sidebar = document.getElementById('sidebar');
-    const hamburger = document.querySelector('.hamburger-menu');
-    if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
-      sidebar.classList.remove('active');
-    }
-  });
-
-  // ---------------- CART SYSTEM ----------------
-
-  const cartElement = document.getElementById('cart-count');
-
-  function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
-    const total = cart.reduce((sum, item) => sum + item.qty, 0);
-    cartElement.textContent = total;
-  }
-
-  function addToCart(item) {
-    let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
-
-    const existingIndex = cart.findIndex(i => i.name === item.name);
-    if (existingIndex !== -1) {
-      cart[existingIndex].qty += 1;
-    } else {
-      cart.push({ ...item, qty: 1 });
-    }
-
-    localStorage.setItem('cartItems', JSON.stringify(cart));
-    updateCartCount();
-  }
-
-  // Attach to all buttons
-  document.querySelectorAll('.order-btn').forEach(button => {
-    button.addEventListener('click', () => {
-      const card = button.closest('.beverage-card');
-      const name = card.querySelector('h3').textContent;
-      const price = parseInt(card.querySelector('.price-tag').textContent.replace('₹', ''));
-      const img = card.querySelector('img').src;
-
-      addToCart({ name, price, img });
-    });
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    updateCartCount();
-
-    const data = JSON.parse(localStorage.getItem('userData')) || {};
-    if (data.fullName) {
-      document.getElementById('profileName').textContent = data.fullName;
-    }
-    if (data.profilePic) {
-      document.getElementById('profilePic').src = data.profilePic;
-    }
-  });
+{% block extra_js %}
+<script>
+function handleAddToCart(btn, id, name, price, img) {
+  addToCart(id, name, price, img);
+  btn.textContent = '✓ Added';
+  btn.classList.add('added');
+  setTimeout(() => { btn.textContent = 'Add'; btn.classList.remove('added'); }, 1500);
+}
 </script>
-
-</body>
-</html>
+{% endblock %}

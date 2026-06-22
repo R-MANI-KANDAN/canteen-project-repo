@@ -1,308 +1,54 @@
+{% extends "registration/base.html" %}
+{% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LICET Cafeteria: Cooked-To-Serve</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    {% load static %}
-    <link rel="stylesheet" href="{%static 'accounts/cooked_to_serve.css'%}">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-</head>
-<body>
-    <!-- Hamburger Menu -->
-    <div class="hamburger-menu" onclick="toggleSidebar()">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-    </div>
-    
-    <nav class="sidebar" id="sidebar">
-    <a href="{% url 'home' %}">Home</a>
-    <a href="{% url 'cart_summary' %}">Cart</a>
-    <a href="{% url 'contact' %}">Contact</a> <!-- or use mailto or a contact section -->
-    </nav>
+{% block body_class %}page-cooked-to-serve{% endblock %}
 
-    <!-- User Button -->
-    <div class="user-button">
-    <img id="profilePic" src="Images/Ready-To-Grab/User-Logo.png" alt="User Profile">
-    <span class="user-info" id="profileName">User Name</span>
-    </div>
+{% block title %}Cooked to Serve – LICET Cafeteria{% endblock %}
+{% block meta_description %}Freshly cooked meals at LICET Cafeteria. Hot and made to order.{% endblock %}
 
+{% block content %}
+<div class="page-wrapper">
+  <h1 class="section-heading">🍳 Cooked to Serve</h1>
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;">Freshly made, just the way you crave!</p>
 
-    <!-- Sidebar Navigation -->
-    <nav class="sidebar" id="sidebar">
-        <a href="#">Home</a>
-        <a href="#">Menu</a>
-        <a href="#">Cart</a>
-        <a href="#">Contact</a>
-    </nav>
-
-    <!-- Header Section -->
-    <div class="header-logo">
-        <img src="Images/Ready-To-Grab/licet_logo.png" alt="LICET Cafeteria Logo">
-        <h1>LICET Cafeteria</h1>
-    </div>
-    
-    <!-- Added Beverage Menu Heading -->
-    <h1 class="menu-heading">Cooked to Serve</h1>
-    <p class="menu-heading">Freshly made, just the way you crave!</p>
-
-    <div class="container">
-        <!-- Veg Fried Rice & Noodles -->
-        <section class="category-section hot-beverages">
-            <div class="category-header">
-                <h2>Veg Lunch</h2>
+  {% if products %}
+    {% regroup products by sub_category as category_list %}
+    {% for group in category_list %}
+      {% if group.grouper %}
+        <h2 class="section-heading" style="font-size:1.1rem;">{{ group.grouper|title }}</h2>
+      {% endif %}
+      <div class="product-grid">
+        {% for product in group.list %}
+        <div class="product-card">
+          <img src="{{ product.image.url }}" alt="{{ product.name }}"
+               onerror="this.src='{% static 'accounts/placeholder.png' %}'">
+          <div class="product-card-body">
+            <div class="product-card-name">{{ product.name|title }}</div>
+            <div class="product-card-footer">
+              <span class="product-price">₹{{ product.price|floatformat:0 }}</span>
+              <button class="add-to-cart-btn"
+                onclick="handleAddToCart(this, {{ product.id }}, '{{ product.name|title }}', {{ product.price }}, '{{ product.image.url }}')">
+                Add
+              </button>
             </div>
-            <div class="scroll-container">
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Veg Fried Rice.jpg" class="beverage-image" alt="Masala Chai">
-                    <h3>Veg Fried Rice</h3>
-                    <p>Wok-fried goodness in every forkful</p>
-                    <div class="price-tag">₹80</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Gobi Fried Rice.jpg" class="beverage-image" alt="Filter Coffee">
-                    <h3>Gobi Fried Rice</h3>
-                    <p>Crispy Gobi meets spicy stir-fry</p>
-                    <div class="price-tag">₹70</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Paneer Fried Rice.jpg" class="beverage-image" alt="Hot Chocolate">
-                    <h3>Paneer Fried Rice</h3>
-                    <p>Paneer power in every bite</p>
-                    <div class="price-tag">₹80</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Mushroom Fried Rice.jpg" class="beverage-image" alt="Green Tea">
-                    <h3>Mushroom Fried Rice</h3>
-                    <p>Mushrooms made mouthwatering</p>
-                    <div class="price-tag">₹75</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Veg Schezwan Fried Rice.jpg" class="beverage-image" alt="Cappuccino">
-                    <h3>Veg Schezwan Fried Rice</h3>
-                    <p>Spice up your life, one bite at a time</p>
-                    <div class="price-tag">₹70</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Mixed Veg Rice.jpg" class="beverage-image" alt="Turmeric Tea">
-                    <h3>Mixed fried Rice</h3>
-                    <p>A riot of flavors in one bowl</p>
-                    <div class="price-tag">₹80</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Mushroom Schezwan Veg Rice.jpg" class="beverage-image" alt="Cappuccino">
-                    <h3>Mushroom Schezwan Veg Rice</h3>
-                    <p>Spice Mushroom</p>
-                    <div class="price-tag">₹70</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                
-            </div>
-        </section>
-
-        <!-- Non-Veg -->
-        <section class="category-section cold-beverages">
-            <div class="category-header">
-                <h2>Non-Veg Lunch</h2>
-            </div>
-            <div class="scroll-container">
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Egg Fried Rice.jpg" class="beverage-image" alt="Lemonade">
-                    <h3>Egg Fried Rice</h3>
-                    <p>Egged up for extra taste</p>
-                    <div class="price-tag">₹60</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Chicken Fried Rice.jpg" class="beverage-image" alt="Iced Coffee">
-                    <h3>Chicken Fried Rice</h3>
-                    <p>The perfect wok-tossed bite</p>
-                    <div class="price-tag">₹75</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Chicken Schezwan Fried Rice.jpg" class="beverage-image" alt="Milkshake">
-                    <h3>Chicken Schezwan fried Rice</h3>
-                    <p>Spicy, saucy, and bold</p>
-                    <div class="price-tag">₹70</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Chicken Chilli Parotta.jpg" class="beverage-image" alt="Soda">
-                    <h3>Chicken Chilli Parotta</h3>
-                    <p>Heat, meat, and flaky street</p>
-                    <div class="price-tag">₹90</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>   
-            </div>
-        </section>
-        
-        <!--Veg -->
-        <section class="category-section hot-beverages">
-            <div class="category-header">
-                <h2>Veg Noodles</h2>
-            </div>
-            <div class="scroll-container">
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Veg Noodles.jpg" class="beverage-image" alt="Lemonade">
-                    <h3>Veg Noodles</h3>
-                    <p>Wok-fried goodness in every forkful</p>
-                    <div class="price-tag">₹60</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Gobi Noodles.jpg" class="beverage-image" alt="Iced Coffee">
-                    <h3>Gobi Noodles</h3>
-                    <p>Crispy Gobi meets spicy stir-fry</p>
-                    <div class="price-tag">₹75</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Paneer Noodles.jpg" class="beverage-image" alt="Milkshake">
-                    <h3>Paneer Noodles</h3>
-                    <p>Paneer power in every bite</p>
-                    <div class="price-tag">₹70</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Mushroom Noodles.jpg" class="beverage-image" alt="Soda">
-                    <h3>Mushroom Noodles</h3>
-                    <p>Mushrooms made mouthwatering</p>
-                    <div class="price-tag">₹80</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div> 
-
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Mushroom schezwan Noodles.jpg" class="beverage-image" alt="Soda">
-                    <h3>Mushroom schezwan Noodles</h3>
-                    <p>Spicy Mushrooms</p>
-                    <div class="price-tag">₹80</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div> 
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Veg Schezwan Noodles.jpg" class="beverage-image" alt="Soda">
-                    <h3>Veg Schezwan Noodles</h3>
-                    <p>Spice up your life, one bite at a time</p>
-                    <div class="price-tag">₹80</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>     
-            </div>
-        </section>
-
-        <!-- Non-Veg -->
-        <section class="category-section cold-beverages">
-            <div class="category-header">
-                <h2>Non-Veg Veg Noodles</h2>
-            </div>
-            <div class="scroll-container">
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Egg Noodles.jpg" class="beverage-image" alt="Egg Noodles">
-                    <h3>Egg Noodles</h3>
-                    <p>Egged up for extra taste</p>
-                    <div class="price-tag">₹60</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Chicken Noodles.jpg" class="beverage-image" alt="Chicken Noodles">
-                    <h3>Chicken Noodles</h3>
-                    <p>The perfect wok-tossed bite</p>
-                    <div class="price-tag">₹75</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-                <div class="beverage-card">
-                    <img src="Images/Cooked-To-Serve/Chicken Schezwan Noodles.jpg" class="beverage-image" alt="Chicken Schezwan Noodles">
-                    <h3>Chicken Schezwan Noodles</h3>
-                    <p>Spicy, saucy, and bold</p>
-                    <div class="price-tag">₹70</div>
-                    <button class="order-btn">Add to Cart</button>
-                </div>
-            </div>
-        </section>
-
-        <button class="cart-button" onclick="window.location.href='6.Cart.html'">🛒 Cart (<span id="cart-count">0</span>)</button>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2025 LICET Cafeteria. All rights reserved.</p>
-        <div class="social-links">
-        <a href="#" aria-label="Facebook"><img src="Images/Landing Page/facebook.jpg" alt="Facebook"></a>
-        <a href="#" aria-label="Instagram"><img src="Images/Landing Page/instagram.jpg" alt="Instagram"></a>
-        <a href="#" aria-label="Twitter"><img src="Images/Landing Page/X.png" alt="Twitter"></a>
+          </div>
         </div>
-    </footer>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:var(--text-muted);padding:2rem 0;">No items available right now. Check back soon!</p>
+  {% endif %}
+</div>
+{% endblock %}
 
-    <script>
-  function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('active');
-  }
-
-  document.addEventListener('click', function(event) {
-    const sidebar = document.getElementById('sidebar');
-    const hamburger = document.querySelector('.hamburger-menu');
-    if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
-      sidebar.classList.remove('active');
-    }
-  });
-
-  // ---------------- CART SYSTEM ----------------
-
-  const cartElement = document.getElementById('cart-count');
-
-  function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
-    const total = cart.reduce((sum, item) => sum + item.qty, 0);
-    cartElement.textContent = total;
-  }
-
-  function addToCart(item) {
-    let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
-
-    const existingIndex = cart.findIndex(i => i.name === item.name);
-    if (existingIndex !== -1) {
-      cart[existingIndex].qty += 1;
-    } else {
-      cart.push({ ...item, qty: 1 });
-    }
-
-    localStorage.setItem('cartItems', JSON.stringify(cart));
-    updateCartCount();
-  }
-
-  // Attach to all buttons
-  document.querySelectorAll('.order-btn').forEach(button => {
-    button.addEventListener('click', () => {
-      const card = button.closest('.beverage-card');
-      const name = card.querySelector('h3').textContent;
-      const price = parseInt(card.querySelector('.price-tag').textContent.replace('₹', ''));
-      const img = card.querySelector('img').src;
-
-      addToCart({ name, price, img });
-    });
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    updateCartCount();
-
-    const data = JSON.parse(localStorage.getItem('userData')) || {};
-    if (data.fullName) {
-      document.getElementById('profileName').textContent = data.fullName;
-    }
-    if (data.profilePic) {
-      document.getElementById('profilePic').src = data.profilePic;
-    }
-  });
+{% block extra_js %}
+<script>
+function handleAddToCart(btn, id, name, price, img) {
+  addToCart(id, name, price, img);
+  btn.textContent = '✓ Added';
+  btn.classList.add('added');
+  setTimeout(() => { btn.textContent = 'Add'; btn.classList.remove('added'); }, 1500);
+}
 </script>
-
-</body>
-</html>
+{% endblock %}

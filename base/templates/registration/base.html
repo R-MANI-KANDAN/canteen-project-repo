@@ -1,0 +1,624 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}LICET Cafeteria{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}LICET Smart Canteen – order food online, skip the queue.{% endblock %}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  {% block extra_css %}{% endblock %}
+  <style>
+    /* ── Reset & Tokens ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand:        #f97316;
+      --brand-dark:   #ea580c;
+      --brand-glow:   rgba(249, 115, 22, 0.25);
+      --bg:           #0a0a12;
+      --surface:      rgba(22, 22, 35, 0.85);
+      --surface2:     rgba(36, 36, 55, 0.7);
+      --text:         #f5f5f5;
+      --text-muted:   #9ca3af;
+      --border:       rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --radius:       16px;
+      --radius-sm:    10px;
+      --shadow:       0 8px 32px rgba(0, 0, 0, 0.4);
+      --transition:   .25s ease;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-image: url("{% static 'accounts/fullscreen-bg.jpg' %}");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;        /* ← parallax effect */
+      color: var(--text);
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(
+        160deg,
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(10, 5, 30, 0.75) 50%,
+        rgba(0, 0, 0, 0.65) 100%
+      );
+      z-index: -1;
+    }
+
+    /* ── Category Themes (Retaining Original Palette) ── */
+    
+    /* Ready to Grab Theme (Lavender / Deep Purple) */
+    body.page-ready-to-grab {
+      --brand:        #2e1a59;
+      --brand-dark:   #1a0e40;
+      --brand-glow:   rgba(46, 26, 89, 0.2);
+      --surface:      rgba(236, 234, 255, 0.85);
+      --surface2:     rgba(236, 234, 255, 0.6);
+      --text:         #2e1a59;
+      --text-muted:   #4a3d6e;
+      --border:       rgba(46, 26, 89, 0.12);
+      --glass-border: rgba(46, 26, 89, 0.18);
+    }
+    body.page-ready-to-grab .add-to-cart-btn {
+      color: #fff !important;
+      background: #2e1a59 !important;
+      box-shadow: 0 4px 12px rgba(46, 26, 89, 0.2);
+    }
+    body.page-ready-to-grab .add-to-cart-btn:hover {
+      background: #1a0e40 !important;
+    }
+    body.page-ready-to-grab .add-to-cart-btn.added {
+      background: #16a34a !important;
+    }
+
+    /* Cooked to Serve Theme (Deep Purple) */
+    body.page-cooked-to-serve {
+      --brand:        #e0a800;
+      --brand-dark:   #c69400;
+      --brand-glow:   rgba(224, 168, 0, 0.25);
+      --surface:      rgba(46, 26, 89, 0.88);
+      --surface2:     rgba(46, 26, 89, 0.6);
+      --text:         #ffffff;
+      --text-muted:   rgba(255, 255, 255, 0.7);
+      --border:       rgba(255, 255, 255, 0.12);
+      --glass-border: rgba(255, 255, 255, 0.18);
+    }
+
+    /* Beverages Theme (Coral Red) */
+    body.page-beverages {
+      --brand:        #ffffff;
+      --brand-dark:   #f0f0f0;
+      --brand-glow:   rgba(255, 255, 255, 0.2);
+      --surface:      rgba(255, 107, 107, 0.85);
+      --surface2:     rgba(255, 107, 107, 0.6);
+      --text:         #ffffff;
+      --text-muted:   rgba(255, 255, 255, 0.8);
+      --border:       rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
+    body.page-beverages .add-to-cart-btn {
+      color: #ff6b6b !important;
+      background: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    body.page-beverages .add-to-cart-btn:hover {
+      background: #ff6b6b !important;
+      color: #ffffff !important;
+      border: 1px solid #ffffff;
+    }
+    body.page-beverages .add-to-cart-btn.added {
+      background: #16a34a !important;
+      color: #ffffff !important;
+    }
+
+    /* Snacks Theme (Green) */
+    body.page-snacks {
+      --brand:        #ffffff;
+      --brand-dark:   #f0f0f0;
+      --brand-glow:   rgba(255, 255, 255, 0.2);
+      --surface:      rgba(76, 175, 80, 0.85);
+      --surface2:     rgba(76, 175, 80, 0.6);
+      --text:         #ffffff;
+      --text-muted:   rgba(255, 255, 255, 0.8);
+      --border:       rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
+    body.page-snacks .add-to-cart-btn {
+      color: #4caf50 !important;
+      background: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    body.page-snacks .add-to-cart-btn:hover {
+      background: #4caf50 !important;
+      color: #ffffff !important;
+      border: 1px solid #ffffff;
+    }
+    body.page-snacks .add-to-cart-btn.added {
+      background: #16a34a !important;
+      color: #ffffff !important;
+    }
+
+    /* Side Dishes Theme (Orange) */
+    body.page-sidedish {
+      --brand:        #ffffff;
+      --brand-dark:   #f0f0f0;
+      --brand-glow:   rgba(255, 255, 255, 0.2);
+      --surface:      rgba(255, 152, 0, 0.85);
+      --surface2:     rgba(255, 152, 0, 0.6);
+      --text:         #ffffff;
+      --text-muted:   rgba(255, 255, 255, 0.8);
+      --border:       rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
+    body.page-sidedish .add-to-cart-btn {
+      color: #ff9800 !important;
+      background: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    body.page-sidedish .add-to-cart-btn:hover {
+      background: #ff9800 !important;
+      color: #ffffff !important;
+      border: 1px solid #ffffff;
+    }
+    body.page-sidedish .add-to-cart-btn.added {
+      background: #16a34a !important;
+      color: #ffffff !important;
+    }
+
+    /* ── Topbar – Glassmorphism ─────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .7rem 1.5rem;
+      background: rgba(10, 10, 18, 0.75);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    }
+    .topbar-brand {
+      display: flex; align-items: center; gap: .75rem;
+      text-decoration: none; color: var(--text);
+    }
+    .topbar-brand img { height: 40px; width: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--brand); }
+    .topbar-brand h1 { font-size: 1.1rem; font-weight: 700; }
+    .topbar-brand span { color: var(--brand); }
+
+    .topbar-nav { display: flex; align-items: center; gap: .25rem; }
+    .topbar-nav a {
+      padding: .4rem .85rem; border-radius: var(--radius-sm);
+      color: var(--text-muted); text-decoration: none;
+      font-size: .85rem; font-weight: 500; transition: var(--transition);
+    }
+    .topbar-nav a:hover, .topbar-nav a.active { background: var(--surface2); color: var(--brand); }
+
+    .topbar-right { display: flex; align-items: center; gap: .75rem; }
+
+    /* Cart – glass */
+    .cart-icon-btn {
+      position: relative;
+      background: var(--surface2); border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      padding: .45rem .85rem; border-radius: var(--radius-sm);
+      color: var(--text); text-decoration: none; font-size: .85rem;
+      display: flex; align-items: center; gap: .4rem; transition: all var(--transition);
+    }
+    .cart-icon-btn:hover { background: var(--brand); color: #fff; border-color: var(--brand); box-shadow: 0 4px 20px var(--brand-glow); }
+    .cart-badge {
+      position: absolute; top: -6px; right: -6px;
+      background: var(--brand); color: #fff;
+      font-size: .65rem; font-weight: 700;
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px var(--brand-glow);
+    }
+
+    /* User avatar – glass */
+    .user-menu { position: relative; }
+    .user-avatar-btn {
+      display: flex; align-items: center; gap: .5rem;
+      background: var(--surface2); border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      padding: .35rem .75rem; border-radius: var(--radius-sm);
+      color: var(--text); cursor: pointer; font-size: .85rem; font-weight: 500;
+      transition: all var(--transition);
+    }
+    .user-avatar-btn img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+    .user-avatar-btn:hover { background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.3); }
+
+    /* Dropdown – glass */
+    .dropdown-menu {
+      display: none; position: absolute; right: 0; top: calc(100% + 8px);
+      background: rgba(15, 15, 30, 0.9); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius); min-width: 190px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); overflow: hidden;
+      animation: dropFade .2s ease;
+    }
+    @keyframes dropFade { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    .dropdown-menu.open { display: block; }
+    .dropdown-menu a {
+      display: block; padding: .7rem 1.1rem;
+      color: var(--text); text-decoration: none; font-size: .875rem;
+      transition: all var(--transition); border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .dropdown-menu a:last-child { border-bottom: none; }
+    .dropdown-menu a:hover { background: rgba(249, 115, 22, 0.1); color: var(--brand); }
+    .dropdown-divider { height: 1px; background: var(--border); }
+
+    /* ── Messages ───────────────────────────────────── */
+    .messages-bar { padding: .5rem 1.5rem; }
+    .message {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .65rem 1rem; border-radius: var(--radius-sm);
+      font-size: .875rem; margin-bottom: .4rem; backdrop-filter: blur(8px);
+    }
+    .message.success { background: rgba(5, 46, 22, 0.8); color: #4ade80; border-left: 3px solid #4ade80; }
+    .message.error   { background: rgba(45, 7, 7, 0.8);  color: #f87171; border-left: 3px solid #f87171; }
+    .message.info    { background: rgba(12, 26, 46, 0.8); color: #60a5fa; border-left: 3px solid #60a5fa; }
+
+    /* ── Page Wrapper ───────────────────────────────── */
+    .page-wrapper { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+    /* ── Menu Card Grid ─────────────────────────────── */
+    .section-heading {
+      font-size: 1.4rem; font-weight: 700; margin: 1.5rem 0 .75rem;
+      display: flex; align-items: center; gap: .5rem; color: var(--text);
+    }
+    .section-heading::after {
+      content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent);
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1.1rem;
+    }
+
+    /* Product cards – glassmorphism */
+    .product-card {
+      background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius); overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      display: flex; flex-direction: column;
+    }
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(249, 115, 22, 0.15);
+      border-color: rgba(249, 115, 22, 0.2);
+    }
+    .product-card img {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover;
+      background: rgba(36, 36, 55, 0.5); transition: transform .4s ease;
+    }
+    .product-card:hover img { transform: scale(1.05); }
+    .product-card-body { padding: .85rem; flex: 1; display: flex; flex-direction: column; gap: .35rem; }
+    .product-card-name { font-weight: 600; font-size: .9rem; color: var(--text); }
+    .product-card-desc { font-size: .78rem; color: var(--text-muted); flex: 1; }
+    .product-card-footer {
+      display: flex; align-items: center; justify-content: space-between; margin-top: .5rem;
+    }
+    .product-price { font-weight: 700; color: var(--brand); font-size: 1.05rem; }
+    .add-to-cart-btn {
+      background: var(--brand); color: #fff; border: none;
+      padding: .4rem .9rem; border-radius: 50px;
+      font-size: .8rem; font-weight: 600; cursor: pointer;
+      transition: all var(--transition); box-shadow: 0 2px 10px var(--brand-glow);
+    }
+    .add-to-cart-btn:hover { background: var(--brand-dark); box-shadow: 0 4px 16px var(--brand-glow); transform: translateY(-1px); }
+    .add-to-cart-btn.added { background: #16a34a; box-shadow: 0 2px 10px rgba(22, 163, 74, 0.3); }
+
+    /* ── Footer – glass ─────────────────────────────── */
+    .site-footer {
+      margin-top: 3rem; padding: 1.5rem;
+      background: rgba(15, 15, 30, 0.8); backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      text-align: center; color: var(--text-muted); font-size: .8rem;
+    }
+    .site-footer .social-links { display: flex; justify-content: center; gap: 1rem; margin-top: .5rem; }
+    .site-footer .social-links a { color: var(--text-muted); text-decoration: none; font-size: .85rem; transition: all var(--transition); }
+    .site-footer .social-links a:hover { color: var(--brand); transform: translateY(-2px); }
+
+    /* ── Profile Modal – glassmorphism ──────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: rgba(22, 22, 40, 0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px; width: 90%; max-width: 480px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+      animation: modalUp .3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes modalUp { from { transform: translateY(30px) scale(0.97); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+    }
+    .modal-header h2 { font-size: 1.05rem; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; transition: color var(--transition); }
+    .modal-close:hover { color: #ff6b6b; }
+    .modal-body { padding: 1.25rem; display: flex; flex-direction: column; gap: .85rem; }
+    .modal-pic-row { display: flex; align-items: center; gap: 1rem; }
+    .modal-pic-row img {
+      width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--brand); box-shadow: 0 4px 16px var(--brand-glow);
+    }
+    .modal-pic-actions { display: flex; flex-direction: column; gap: .35rem; }
+    .btn-sm {
+      font-size: .78rem; padding: .35rem .75rem; border-radius: 50px;
+      cursor: pointer; font-weight: 500; transition: all var(--transition);
+    }
+    .btn-primary { background: var(--brand); color: #fff; border: none; box-shadow: 0 2px 10px var(--brand-glow); }
+    .btn-primary:hover { background: var(--brand-dark); transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+    .btn-outline:hover { border-color: var(--brand); color: var(--brand); }
+    .form-group { display: flex; flex-direction: column; gap: .35rem; }
+    .form-group label { font-size: .8rem; color: var(--text-muted); font-weight: 500; }
+    .form-group input, .form-group select {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); color: var(--text);
+      padding: .55rem .8rem; font-size: .875rem; font-family: inherit;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none; border-color: var(--brand); background: rgba(249, 115, 22, 0.05);
+    }
+    .form-group select option { background: #1a1a30; color: var(--text); }
+    .modal-footer { padding: 1rem 1.25rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: .5rem; }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .topbar-nav { display: none; }
+      .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    }
+  </style>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+<!-- ── Top Navigation Bar ─────────────────────────────────────────────────── -->
+<header class="topbar">
+  <a href="{% url 'home' %}" class="topbar-brand">
+    <img src="{% static 'accounts/licet_logo.png' %}" alt="LICET Logo" onerror="this.style.display='none'">
+    <h1>LICET <span>Cafeteria</span></h1>
+  </a>
+
+  <nav class="topbar-nav">
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'ready_to_grab' %}">Ready to Grab</a>
+    <a href="{% url 'cooked_to_serve' %}">Cooked to Serve</a>
+    <a href="{% url 'beverages' %}">Beverages</a>
+    <a href="{% url 'snacks' %}">Snacks</a>
+    <a href="{% url 'sidedish' %}">Side Dish</a>
+    <a href="{% url 'contact' %}">Contact</a>
+    {% if user.is_staff %}<a href="{% url 'kitchen_dashboard' %}">🍳 Kitchen</a>{% endif %}
+  </nav>
+
+  <div class="topbar-right">
+    <!-- Cart -->
+    <a href="{% url 'cart_summary' %}" class="cart-icon-btn" id="nav-cart-link">
+      🛒 Cart
+      <span class="cart-badge" id="nav-cart-badge">0</span>
+    </a>
+
+    <!-- User Menu -->
+    {% if user.is_authenticated %}
+    <div class="user-menu">
+      <button class="user-avatar-btn" onclick="toggleDropdown()" id="userAvatarBtn">
+        <img src="{% static 'accounts/User-Logo.png' %}" alt="Avatar" id="topbar-avatar" onerror="this.style.display='none'">
+        <span id="topbar-username">
+          {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.email|truncatechars:20 }}{% endif %}
+        </span>
+        ▾
+      </button>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="#" onclick="openProfileModal(); return false;">✏️ Edit Profile</a>
+        <div class="dropdown-divider"></div>
+        <a href="{% url 'logout' %}">🚪 Logout</a>
+      </div>
+    </div>
+    {% else %}
+    <a href="{% url 'login' %}" class="btn-sm btn-primary">Login</a>
+    {% endif %}
+  </div>
+</header>
+
+<!-- ── Django Messages ────────────────────────────────────────────────────── -->
+{% if messages %}
+<div class="messages-bar">
+  {% for msg in messages %}
+  <div class="message {{ msg.tags }}">{{ msg }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ── Page Content ───────────────────────────────────────────────────────── -->
+{% block content %}{% endblock %}
+
+<!-- ── Footer ────────────────────────────────────────────────────────────── -->
+<footer class="site-footer">
+  <p>&copy; 2025 LICET Cafeteria. All rights reserved.</p>
+  <div class="social-links">
+    <a href="#">Facebook</a>
+    <a href="#">Instagram</a>
+    <a href="#">Twitter</a>
+  </div>
+</footer>
+
+<!-- ── Profile Modal ─────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="profileModal" onclick="handleModalOverlayClick(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>Edit Profile</h2>
+      <button class="modal-close" onclick="closeProfileModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Profile picture -->
+      <div class="modal-pic-row">
+        <img src="{% static 'accounts/User-Logo.png' %}" alt="Profile" id="profilePicPreview">
+        <div class="modal-pic-actions">
+          <label class="btn-sm btn-primary" style="display:inline-block;cursor:pointer;">
+            📷 Change Photo
+            <input type="file" id="profilePicInput" accept="image/*" style="display:none" onchange="handlePicChange(event)">
+          </label>
+          <button class="btn-sm btn-outline" onclick="removeProfilePic()">Remove</button>
+        </div>
+      </div>
+      <!-- Fields -->
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="modal-fullName"
+               value="{% if user.get_full_name %}{{ user.get_full_name }}{% endif %}"
+               placeholder="Your full name">
+      </div>
+      <div class="form-group">
+        <label>Year of Study</label>
+        <select id="modal-yearOfStudy">
+          <option value="">-- Select --</option>
+          <option value="1st Year">1st Year</option>
+          <option value="2nd Year">2nd Year</option>
+          <option value="3rd Year">3rd Year</option>
+          <option value="4th Year">4th Year</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Batch</label>
+        <input type="text" id="modal-batch" value="" placeholder="e.g. 2021-2025">
+      </div>
+      <div class="form-group">
+        <label>Department</label>
+        <select id="modal-department">
+          <option value="">-- Select --</option>
+          <option value="CSE">CSE</option>
+          <option value="ECE">ECE</option>
+          <option value="IT">IT</option>
+          <option value="EEE">EEE</option>
+          <option value="MECH">MECH</option>
+          <option value="AIDS">AIDS</option>
+        </select>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline" onclick="closeProfileModal()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="saveProfile()" id="saveProfileBtn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Shared JS ──────────────────────────────────────────────────────────── -->
+<script>
+// ── Cart counter (localStorage) ──────────────────────────────────────────────
+function getCart() { return JSON.parse(localStorage.getItem('cartItems') || '[]'); }
+function saveCart(c) { localStorage.setItem('cartItems', JSON.stringify(c)); }
+
+function updateNavCartBadge() {
+  const total = getCart().reduce((s, i) => s + i.qty, 0);
+  const badge = document.getElementById('nav-cart-badge');
+  if (badge) badge.textContent = total;
+}
+
+function addToCart(id, name, price, imgUrl) {
+  const cart = getCart();
+  const idx = cart.findIndex(i => i.id === id);
+  if (idx > -1) { cart[idx].qty += 1; }
+  else { cart.push({ id, name, price, img: imgUrl, qty: 1 }); }
+  saveCart(cart);
+  updateNavCartBadge();
+}
+
+// ── Dropdown ─────────────────────────────────────────────────────────────────
+function toggleDropdown() {
+  document.getElementById('dropdownMenu').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const menu = document.getElementById('userAvatarBtn');
+  const drop = document.getElementById('dropdownMenu');
+  if (drop && menu && !menu.contains(e.target)) drop.classList.remove('open');
+});
+
+// ── Profile modal ─────────────────────────────────────────────────────────────
+function openProfileModal()  { document.getElementById('profileModal').classList.add('open'); }
+function closeProfileModal() { document.getElementById('profileModal').classList.remove('open'); }
+function handleModalOverlayClick(e) {
+  if (e.target === document.getElementById('profileModal')) closeProfileModal();
+}
+
+let tempProfilePic = null;
+function handlePicChange(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('Please pick an image file.'); return; }
+  if (file.size > 5 * 1024 * 1024)    { alert('Max 5 MB.');                  return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('profilePicPreview').src = ev.target.result;
+    tempProfilePic = file;
+  };
+  reader.readAsDataURL(file);
+}
+function removeProfilePic() {
+  document.getElementById('profilePicPreview').src = '';
+  document.getElementById('profilePicInput').value = '';
+  tempProfilePic = null;
+}
+
+function saveProfile() {
+  const btn = document.getElementById('saveProfileBtn');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+
+  const fd = new FormData();
+  fd.append('fullName',    document.getElementById('modal-fullName').value);
+  fd.append('yearOfStudy', document.getElementById('modal-yearOfStudy').value);
+  fd.append('batch',       document.getElementById('modal-batch').value);
+  fd.append('department',  document.getElementById('modal-department').value);
+  if (tempProfilePic) fd.append('profilePic', tempProfilePic);
+
+  fetch("{% url 'update_profile_ajax' %}", {
+    method: 'POST',
+    headers: { 'X-CSRFToken': getCsrfToken() },
+    body: fd,
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === 'success') {
+      // Update topbar avatar + username
+      const avatar = document.getElementById('topbar-avatar');
+      if (avatar && data.profilePicUrl) avatar.src = data.profilePicUrl;
+      const uname = document.getElementById('topbar-username');
+      if (uname && data.fullName) uname.textContent = data.fullName;
+      closeProfileModal();
+      tempProfilePic = null;
+    } else { alert('Error saving profile.'); }
+  })
+  .catch(() => alert('Network error.'))
+  .finally(() => { btn.textContent = 'Save Changes'; btn.disabled = false; });
+}
+
+function getCsrfToken() {
+  const cookies = document.cookie.split(';');
+  for (const c of cookies) {
+    const [k, v] = c.trim().split('=');
+    if (k === 'csrftoken') return v;
+  }
+  return '';
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', updateNavCartBadge);
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

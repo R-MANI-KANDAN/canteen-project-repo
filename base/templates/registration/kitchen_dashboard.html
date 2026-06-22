@@ -1,0 +1,106 @@
+{% extends "registration/base.html" %}
+{% load static %}
+
+{% block title %}Kitchen Dashboard – LICET Cafeteria{% endblock %}
+
+{% block extra_css %}
+<style>
+  .kitchen-page { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
+  .kitchen-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .kitchen-header h1 { font-size: 1.5rem; font-weight: 700; }
+  .live-badge { display: flex; align-items: center; gap: .5rem; background: rgba(5, 46, 22, 0.4); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); border-radius: 20px; padding: .3rem .85rem; font-size: .8rem; font-weight: 600; backdrop-filter: blur(10px); }
+  .live-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; animation: pulse 1.5s infinite; box-shadow: 0 0 8px #4ade80; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media(max-width:700px){ .grid-2 { grid-template-columns: 1fr; } }
+  .order-column h2 { font-size: 1rem; font-weight: 700; margin-bottom: .75rem; display: flex; align-items: center; gap: .4rem; }
+  .pending-label { color: #fbbf24; } .done-label { color: #4ade80; }
+  
+  /* Order Cards - Glassmorphism */
+  .order-card {
+    background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 1.1rem; margin-bottom: .85rem;
+    box-shadow: var(--shadow);
+    transition: all var(--transition);
+  }
+  .order-card:hover { transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.18); }
+  .order-card.done { opacity: .55; }
+  .order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+  .order-ref { font-weight: 700; color: var(--brand); font-size: .95rem; }
+  .order-badge { font-size: .72rem; font-weight: 600; padding: .2rem .55rem; border-radius: 10px; }
+  .badge-pending { background: rgba(251,191,36,.15); color: #fbbf24; border: 1px solid rgba(251,191,36,.4); }
+  .badge-done { background: rgba(74,222,128,.15); color: #4ade80; border: 1px solid rgba(74,222,128,.4); }
+  .order-item { font-size: .875rem; color: var(--text); margin-bottom: .25rem; }
+  .order-meta { font-size: .78rem; color: var(--text-muted); margin-top: .5rem; border-top: 1px solid rgba(255,255,255,0.04); padding-top: .5rem; }
+  .order-meta span { margin-right: .75rem; display: inline-flex; align-items: center; gap: .2rem; }
+  
+  .toggle-btn {
+    margin-top: .85rem; width: 100%; padding: .5rem; border-radius: 50px; border: none; cursor: pointer;
+    font-size: .8rem; font-weight: 600; transition: all var(--transition); font-family: inherit;
+  }
+  .toggle-btn.pending { background: #16a34a; color: #fff; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3); }
+  .toggle-btn.pending:hover { background: #15803d; transform: translateY(-1px); }
+  .toggle-btn.done { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--glass-border); }
+  .toggle-btn.done:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+  .empty-col { color: var(--text-muted); font-size: .875rem; background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 12px; text-align: center; border: 1px dashed var(--border); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="kitchen-page">
+  <div class="kitchen-header">
+    <h1>🍳 Kitchen Dashboard</h1>
+    <div class="live-badge"><span class="live-dot"></span> LIVE</div>
+  </div>
+  <div class="grid-2">
+    <div class="order-column">
+      <h2 class="pending-label">⏳ Pending ({{ pending|length }})</h2>
+      {% for order in pending %}
+      <div class="order-card">
+        <div class="order-top">
+          <span class="order-ref">LCT-{{ order.order_id|stringformat:"04d" }}</span>
+          <span class="order-badge badge-pending">Pending</span>
+        </div>
+        <div class="order-item"><strong>{{ order.product.name|title }}</strong> × {{ order.quantity }}</div>
+        <div class="order-meta">
+          <span>🕐 {{ order.pickup_time }}</span>
+          <span>📦 {{ order.order_type }}</span>
+          <span>👤 {{ order.customer.email|truncatechars:20 }}</span>
+        </div>
+        <button class="toggle-btn pending" onclick="toggleStatus({{ order.order_id }}, this)">✅ Mark as Done</button>
+      </div>
+      {% empty %}<p class="empty-col">No pending orders 🎉</p>{% endfor %}
+    </div>
+    <div class="order-column">
+      <h2 class="done-label">✅ Completed (last 20)</h2>
+      {% for order in completed %}
+      <div class="order-card done">
+        <div class="order-top">
+          <span class="order-ref">LCT-{{ order.order_id|stringformat:"04d" }}</span>
+          <span class="order-badge badge-done">Done</span>
+        </div>
+        <div class="order-item">{{ order.product.name|title }} × {{ order.quantity }}</div>
+        <div class="order-meta"><span>🕐 {{ order.pickup_time }}</span><span>📦 {{ order.order_type }}</span></div>
+        <button class="toggle-btn done" onclick="toggleStatus({{ order.order_id }}, this)">↩ Mark as Pending</button>
+      </div>
+      {% empty %}<p class="empty-col">No completed orders yet.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleStatus(orderId, btn) {
+  btn.disabled = true;
+  fetch(`/kitchen/toggle/${orderId}/`, {
+    method: 'POST', headers: { 'X-CSRFToken': getCsrfToken() }
+  }).then(r => r.json()).then(d => {
+    if (d.status === 'success') window.location.reload();
+    else { alert('Error.'); btn.disabled = false; }
+  }).catch(() => { alert('Network error.'); btn.disabled = false; });
+}
+setTimeout(() => window.location.reload(), 30000);
+</script>
+{% endblock %}
