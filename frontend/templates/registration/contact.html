@@ -1,0 +1,83 @@
+<!-- Description: Contact and support form page for canteen inquiries. -->
+{% extends "registration/base.html" %}
+{% load static %}
+
+{% block title %}Contact Us – LICET Cafeteria{% endblock %}
+{% block meta_description %}Get in touch with LICET Cafeteria. Find our location, hours, and send us a message.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/contact.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="contact-page">
+  <h1 class="section-heading">📬 Contact Us</h1>
+  <p style="color:var(--text-muted)">Questions, feedback, or just want to say hello? We'd love to hear from you.</p>
+
+  <div class="contact-grid">
+    <!-- Info -->
+    <div class="info-card">
+      <h2>Our Details</h2>
+      <div class="info-row">
+        <span class="info-icon">📍</span>
+        <div>
+          <div class="info-label">Address</div>
+          <div class="info-value">Loyola-ICAM College of Engineering and Technology<br>Nungambakkam, Chennai – 600 034</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">🕐</span>
+        <div>
+          <div class="info-label">Canteen Hours</div>
+          <table class="hours-table">
+            <tr><td>Mon – Fri</td><td>8:00 AM – 4:00 PM</td></tr>
+            <tr><td>Saturday</td><td>9:00 AM – 1:00 PM</td></tr>
+            <tr><td>Sunday</td><td>Closed</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">📞</span>
+        <div>
+          <div class="info-label">Phone</div>
+          <div class="info-value">+91 44 2817 1948</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">✉️</span>
+        <div>
+          <div class="info-label">Email</div>
+          <div class="info-value">canteen@licet.ac.in</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-card">
+      <h2>Send a Message</h2>
+      <form class="contact-form" onsubmit="handleContactSubmit(event)">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Your name" required>
+        <input type="email" name="email" placeholder="Your email" required>
+        <input type="text" name="subject" placeholder="Subject">
+        <textarea name="message" placeholder="Your message…" required></textarea>
+        <button type="submit" class="contact-submit">Send Message 📨</button>
+      </form>
+      <p id="contact-success" style="display:none;color:#4ade80;margin-top:.75rem;font-size:.875rem;">
+        ✅ Message sent! We'll get back to you soon.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function handleContactSubmit(e) {
+  e.preventDefault();
+  // Simulated success (no backend mailer configured)
+  e.target.style.display = 'none';
+  document.getElementById('contact-success').style.display = 'block';
+}
+</script>
+{% endblock %}

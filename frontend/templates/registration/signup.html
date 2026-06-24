@@ -1,0 +1,82 @@
+<!-- Description: User signup and registration page. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LICET Cafeteria - Sign Up</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'styles/styles-signup.css' %}"> <!-- Link to your sign-up CSS file -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  
+</head>
+<body>
+  <!-- Full-Screen Background -->
+  <div class="fullscreen-bg"></div>
+
+  <!-- Logo and Title -->
+  <div class="logo-container">
+    <img src="{% static 'images/logo.png' %}" alt="LICET Cafeteria Logo" class="logo">
+    <h1>LICET Cafeteria</h1>
+  </div>
+
+  <!-- Sign-Up Form -->
+  <div class="signup-container">
+    <form class="signup-form" method="post">
+      {% csrf_token %}
+      <h2>Sign Up</h2>
+
+      <!-- Display error messages -->
+      {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Render Django form fields -->
+      {{ form.as_p }}
+
+      <button type="submit">Sign Up</button>
+      <div class="divider">or</div>
+      <button class="google-btn" type="button">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
+        Continue with Google
+      </button>
+      <p class="login-link">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+    </form>
+  </div>
+
+  <!-- JavaScript for Password Toggle -->
+  <script>
+    function togglePassword(inputId) {
+      const passwordInput = document.getElementById(inputId);
+      const toggleIcon = passwordInput.nextElementSibling;
+
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggleIcon.textContent = "👁️"; // Change icon to "hide" state
+      } else {
+        passwordInput.type = "password";
+        toggleIcon.textContent = "👁️"; // Change icon to "show" state
+      }
+    }
+
+    // Add toggle icons to the password fields rendered by Django
+    document.addEventListener("DOMContentLoaded", function() {
+      const passwordFields = document.querySelectorAll('input[type="password"]');
+      passwordFields.forEach(field => {
+        const toggleIcon = document.createElement("span");
+        toggleIcon.className = "toggle-icon";
+        toggleIcon.textContent = "👁️";
+        toggleIcon.onclick = () => togglePassword(field.id);
+        field.parentNode.classList.add("password-toggle");
+        field.parentNode.appendChild(toggleIcon);
+      });
+    });
+  </script>
+</body>
+</html>

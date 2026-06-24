@@ -1,0 +1,284 @@
+<!-- Description: Template showing the user's current shopping cart summary and total price. -->
+{% extends "registration/base.html" %}
+{% load static %}
+
+{% block title %}Your Cart – LICET Cafeteria{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'styles/cart_summary.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cart-page">
+  <h2 class="page-title">🛒 Your Cart</h2>
+
+  <!-- Cart Table -->
+  <div id="cart-container">
+    <!-- Rendered by JS -->
+  </div>
+
+  <!-- Summary + Slot + Checkout -->
+  <div id="checkout-panel" style="display:none">
+    <!-- Summary -->
+    <div class="summary-box">
+      <div class="summary-row"><span>Subtotal</span><span>₹<span id="subtotal">0</span></span></div>
+      <div class="summary-row"><span>Discount</span><span>-₹<span id="discount">0</span></span></div>
+      <div class="summary-row total"><span>Total</span><span>₹<span id="total">0</span></span></div>
+      <div class="coupon-row">
+        <input type="text" id="coupon" placeholder="Coupon code (e.g. LICET5)">
+        <button onclick="applyCoupon()">Apply</button>
+      </div>
+    </div>
+
+    <!-- Date Selection -->
+    <div class="section-card">
+      <h3>📅 Pickup Date</h3>
+      <input type="date" id="order-date" class="date-input">
+    </div>
+
+    <!-- Time Slot -->
+    <div class="section-card">
+      <h3>🕐 Pickup Time Slot</h3>
+      <div class="option-chips" id="time-chips">
+        <div class="chip active" data-value="12:45">12:45 PM</div>
+        <div class="chip" data-value="12:50">12:50 PM</div>
+        <div class="chip" data-value="12:55">12:55 PM</div>
+        <div class="chip" data-value="13:00">1:00 PM</div>
+        <div class="chip" data-value="13:05">1:05 PM</div>
+        <div class="chip" data-value="13:10">1:10 PM</div>
+      </div>
+    </div>
+
+    <!-- Order Type -->
+    <div class="section-card">
+      <h3>🍽️ Order Type</h3>
+      <div class="option-chips" id="type-chips">
+        <div class="chip active" data-value="Dine In">🍽️ Dine In</div>
+        <div class="chip" data-value="Takeaway">📦 Takeaway</div>
+      </div>
+    </div>
+
+    <!-- Checkout -->
+    <button class="checkout-btn" id="checkoutBtn" onclick="placeOrder()">
+      ✅ Place Order
+    </button>
+  </div>
+</div>
+
+<!-- Receipt Modal -->
+<div class="receipt-modal" id="receiptModal">
+  <div class="receipt-box">
+    <div class="receipt-title">✅ Order Confirmed!</div>
+    <div class="receipt-row"><span>Order Ref</span><span id="r-ref">–</span></div>
+    <div class="receipt-row"><span>Items</span><span id="r-items">–</span></div>
+    <div class="receipt-row"><span>Pickup</span><span id="r-pickup">–</span></div>
+    <div class="receipt-row"><span>Type</span><span id="r-type">–</span></div>
+    <div class="receipt-row"><span>Total Paid</span><span>₹<span id="r-total">0</span></span></div>
+    <div id="receiptQR"></div>
+    <div class="receipt-actions">
+      <button class="btn-dl" onclick="downloadReceipt()">📥 Download</button>
+      <button class="btn-done" onclick="finishOrder()">Done</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script>
+const CSRF = getCsrfToken();
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let cartItems  = getCart();    // [{ id, name, price, img, qty }, …]
+let selectedTime = '12:45';
+let selectedType = 'Dine In';
+let discountAmount = 0;
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderCart() {
+  cartItems = getCart();
+  const container = document.getElementById('cart-container');
+  const panel     = document.getElementById('checkout-panel');
+
+  if (!cartItems.length) {
+    container.innerHTML = `
+      <div class="empty-cart">
+        <div class="icon">🛒</div>
+        <p style="font-size:1.1rem;font-weight:600;margin-bottom:.5rem;">Your cart is empty</p>
+        <p>Browse the menu and add items to get started.</p>
+        <a href="/" style="display:inline-block;margin-top:1rem;color:var(--brand);">← Back to Home</a>
+      </div>`;
+    panel.style.display = 'none';
+    return;
+  }
+
+  let subtotal = 0;
+  const rows = cartItems.map((item, i) => {
+    const tot = item.price * item.qty;
+    subtotal += tot;
+    return `
+      <tr>
+        <td>
+          <div class="item-cell">
+            <img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'">
+            <span class="item-name">${item.name}</span>
+          </div>
+        </td>
+        <td class="price-cell">₹${item.price}</td>
+        <td>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="changeQty(${i}, -1)">−</button>
+            <span class="qty-value">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${i}, 1)">+</button>
+          </div>
+        </td>
+        <td class="price-cell">₹${tot}</td>
+        <td><button class="remove-btn" onclick="removeItem(${i})">🗑</button></td>
+      </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <table class="cart-table">
+      <thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Subtotal</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  panel.style.display = 'block';
+  applyDiscount(subtotal);
+  updateNavCartBadge();
+}
+
+function applyDiscount(subtotal) {
+  const code = document.getElementById('coupon')?.value?.trim().toUpperCase();
+  discountAmount = code === 'LICET5' ? Math.round(subtotal * 0.05) : 0;
+  const total = subtotal - discountAmount;
+  document.getElementById('subtotal').textContent = subtotal;
+  document.getElementById('discount').textContent = discountAmount;
+  document.getElementById('total').textContent    = total;
+}
+
+function applyCoupon() {
+  const subtotal = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
+  applyDiscount(subtotal);
+}
+
+function changeQty(idx, delta) {
+  const cart = getCart();
+  cart[idx].qty = Math.max(1, cart[idx].qty + delta);
+  saveCart(cart);
+  renderCart();
+}
+
+function removeItem(idx) {
+  const cart = getCart();
+  cart.splice(idx, 1);
+  saveCart(cart);
+  renderCart();
+}
+
+// ── Chips ─────────────────────────────────────────────────────────────────────
+function initChips(containerId, onSelect) {
+  document.getElementById(containerId).addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll(`#${containerId} .chip`).forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    onSelect(chip.dataset.value);
+  });
+}
+
+// ── Place Order (POST to Django) ──────────────────────────────────────────────
+function placeOrder() {
+  const btn = document.getElementById('checkoutBtn');
+  btn.disabled = true;
+  btn.textContent = 'Placing Order…';
+
+  const date     = document.getElementById('order-date').value;
+  const payload  = {
+    items:       cartItems.map(i => ({ id: i.id, qty: i.qty })),
+    pickup_time: selectedTime,
+    order_type:  selectedType,
+    date:        date,
+  };
+
+  fetch("{% url 'checkout_order' %}", {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body:    JSON.stringify(payload),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === 'success') {
+      showReceipt(data.order_ref, date);
+      saveCart([]);          // clear cart ONLY after server confirms
+      updateNavCartBadge();
+    } else {
+      alert('Order failed: ' + (data.message || 'Unknown error'));
+    }
+  })
+  .catch(() => alert('Network error – please try again.'))
+  .finally(() => { btn.disabled = false; btn.textContent = '✅ Place Order'; });
+}
+
+// ── Receipt ───────────────────────────────────────────────────────────────────
+function showReceipt(orderRef, date) {
+  const total = parseInt(document.getElementById('total').textContent);
+  const names = cartItems.map(i => `${i.name} x${i.qty}`).join(', ');
+
+  document.getElementById('r-ref').textContent    = orderRef;
+  document.getElementById('r-items').textContent  = names;
+  document.getElementById('r-pickup').textContent = `${date} at ${selectedTime}`;
+  document.getElementById('r-type').textContent   = selectedType;
+  document.getElementById('r-total').textContent  = total;
+
+  // QR Code
+  const qrDiv = document.getElementById('receiptQR');
+  qrDiv.innerHTML = '';
+  QRCode.toCanvas(document.createElement('canvas'),
+    `LICET Cafeteria\nRef: ${orderRef}\nItems: ${names}\nPickup: ${date} ${selectedTime}\nType: ${selectedType}\nTotal: ₹${total}`,
+    { width: 160, color: { dark: '#f97316', light: '#1a1a1a' } },
+    (err, canvas) => { if (!err) qrDiv.appendChild(canvas); }
+  );
+
+  document.getElementById('receiptModal').classList.add('open');
+}
+
+function downloadReceipt() {
+  const ref   = document.getElementById('r-ref').textContent;
+  const lines = [
+    'LICET Cafeteria – Order Receipt',
+    '================================',
+    `Order Ref : ${ref}`,
+    `Items     : ${document.getElementById('r-items').textContent}`,
+    `Pickup    : ${document.getElementById('r-pickup').textContent}`,
+    `Type      : ${document.getElementById('r-type').textContent}`,
+    `Total Paid: ₹${document.getElementById('r-total').textContent}`,
+    '================================',
+    'Thank you for your order!',
+  ].join('\n');
+
+  const blob = new Blob([lines], { type: 'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `${ref}.txt`; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function finishOrder() {
+  document.getElementById('receiptModal').classList.remove('open');
+  renderCart();   // will show empty cart
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // default date = today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('order-date').value = today;
+
+  initChips('time-chips', v => { selectedTime = v; });
+  initChips('type-chips', v => { selectedType = v; });
+
+  renderCart();
+});
+</script>
+{% endblock %}

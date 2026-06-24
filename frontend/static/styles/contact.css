@@ -1,0 +1,39 @@
+/* Description: Stylesheet specifying info card grid, map preview, and contact form styles. */
+.contact-page { max-width: 860px; margin: 0 auto; padding: 2rem 1rem; }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem; }
+  @media(max-width:600px){ .contact-grid { grid-template-columns: 1fr; } }
+
+  /* Info & Form Cards - Glassmorphism */
+  .info-card, .form-card {
+    background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .info-card h2, .form-card h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; }
+  .info-row { display: flex; align-items: flex-start; gap: .75rem; margin-bottom: .85rem; }
+  .info-icon { font-size: 1.25rem; margin-top: .1rem; }
+  .info-label { font-size: .78rem; color: var(--text-muted); }
+  .info-value { font-size: .9rem; font-weight: 500; }
+
+  .contact-form { display: flex; flex-direction: column; gap: .75rem; }
+  .contact-form input, .contact-form textarea {
+    background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm); color: var(--text);
+    padding: .6rem .85rem; font-family: inherit; font-size: .875rem;
+    transition: all var(--transition);
+  }
+  .contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--brand); background: rgba(249, 115, 22, 0.05); }
+  .contact-form textarea { resize: vertical; min-height: 110px; }
+  .contact-submit {
+    background: var(--brand); color: #fff; border: none;
+    border-radius: 50px; padding: .65rem;
+    font-size: .9rem; font-weight: 600; cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: 0 4px 15px var(--brand-glow);
+  }
+  .contact-submit:hover { background: var(--brand-dark); transform: translateY(-1px); box-shadow: 0 6px 20px var(--brand-glow); }
+  .hours-table { width: 100%; font-size: .875rem; border-collapse: collapse; margin-top: .5rem; }
+  .hours-table td { padding: .35rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .hours-table tr:last-child td { border-bottom: none; }
+  .hours-table td:last-child { text-align: right; color: var(--text-muted); }

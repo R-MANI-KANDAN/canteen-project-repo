@@ -1,0 +1,40 @@
+/* Description: Stylesheet for order cards grid, state badges, and toggle control buttons on kitchen dashboard. */
+.kitchen-page { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
+  .kitchen-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .kitchen-header h1 { font-size: 1.5rem; font-weight: 700; }
+  .live-badge { display: flex; align-items: center; gap: .5rem; background: rgba(5, 46, 22, 0.4); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); border-radius: 20px; padding: .3rem .85rem; font-size: .8rem; font-weight: 600; backdrop-filter: blur(10px); }
+  .live-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; animation: pulse 1.5s infinite; box-shadow: 0 0 8px #4ade80; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media(max-width:700px){ .grid-2 { grid-template-columns: 1fr; } }
+  .order-column h2 { font-size: 1rem; font-weight: 700; margin-bottom: .75rem; display: flex; align-items: center; gap: .4rem; }
+  .pending-label { color: #fbbf24; } .done-label { color: #4ade80; }
+  
+  /* Order Cards - Glassmorphism */
+  .order-card {
+    background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 1.1rem; margin-bottom: .85rem;
+    box-shadow: var(--shadow);
+    transition: all var(--transition);
+  }
+  .order-card:hover { transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.18); }
+  .order-card.done { opacity: .55; }
+  .order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+  .order-ref { font-weight: 700; color: var(--brand); font-size: .95rem; }
+  .order-badge { font-size: .72rem; font-weight: 600; padding: .2rem .55rem; border-radius: 10px; }
+  .badge-pending { background: rgba(251,191,36,.15); color: #fbbf24; border: 1px solid rgba(251,191,36,.4); }
+  .badge-done { background: rgba(74,222,128,.15); color: #4ade80; border: 1px solid rgba(74,222,128,.4); }
+  .order-item { font-size: .875rem; color: var(--text); margin-bottom: .25rem; }
+  .order-meta { font-size: .78rem; color: var(--text-muted); margin-top: .5rem; border-top: 1px solid rgba(255,255,255,0.04); padding-top: .5rem; }
+  .order-meta span { margin-right: .75rem; display: inline-flex; align-items: center; gap: .2rem; }
+  
+  .toggle-btn {
+    margin-top: .85rem; width: 100%; padding: .5rem; border-radius: 50px; border: none; cursor: pointer;
+    font-size: .8rem; font-weight: 600; transition: all var(--transition); font-family: inherit;
+  }
+  .toggle-btn.pending { background: #16a34a; color: #fff; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3); }
+  .toggle-btn.pending:hover { background: #15803d; transform: translateY(-1px); }
+  .toggle-btn.done { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--glass-border); }
+  .toggle-btn.done:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+  .empty-col { color: var(--text-muted); font-size: .875rem; background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 12px; text-align: center; border: 1px dashed var(--border); }

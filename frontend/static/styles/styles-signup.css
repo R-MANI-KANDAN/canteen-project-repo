@@ -1,0 +1,231 @@
+/* Description: Stylesheet for the signup page container, form inputs, and validation indicators. */
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: flex-end; /* Align sign-up form to the right */
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden; /* Prevent scrolling */
+  }
+  
+  /* Full-Screen Background */
+  .fullscreen-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../images/fullscreen-bg1.jpg'); /* New background image */
+    background-size: cover;
+    background-position: center;
+    z-index: -1; /* Place behind everything */
+  }
+  
+  /* Logo and Title */
+  .logo-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .logo {
+    width: 70px; /* Increased logo size */
+    height: auto;
+    filter: brightness(1.2); /* Make the logo more visible */
+  }
+  
+  .logo-container h1 {
+    font-size: 1.8rem; /* Slightly larger text */
+    color: #ffffff; /* White color */
+    margin: 0;
+    font-weight: 600; /* Bold text */
+  }
+  
+  /* Sign-Up Container */
+  .signup-container {
+    margin-right: 10%; /* Shift the sign-up form to the right */
+    z-index: 1; /* Place above the background */
+  }
+  
+  /* Sign-Up Form */
+  .signup-form {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 400px; /* Same width as login form */
+  }
+  
+  .signup-form h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .signup-form input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+  
+  .signup-form input:focus {
+    outline: none;
+    border-color: #ffc107; /* Warm yellow color */
+  }
+  
+  .signup-form button {
+    width: 100%;
+    padding: 12px;
+    background-color: #ffc107; /* Warm yellow color */
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .signup-form button:hover {
+    background-color: #e0a800; /* Darker yellow on hover */
+  }
+  
+  /* Extra Login Button */
+  .login-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: transparent; /* Transparent background */
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px; /* Space above the button */
+  }
+  
+  .login-btn:hover {
+    background-color: #f4f4f9; /* Light gray on hover */
+  }
+  
+  /* Divider and Google Button */
+  .divider {
+    text-align: center;
+    margin: 20px 0;
+    color: #999;
+    position: relative;
+  }
+  
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: #ddd;
+    position: absolute;
+    top: 50%;
+    width: 45%;
+  }
+  
+  .divider::before {
+    left: 0;
+  }
+  
+  .divider::after {
+    right: 0;
+  }
+  
+  .google-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .google-btn:hover {
+    background-color: #f4f4f9;
+  }
+  
+  .google-btn img {
+    width: 20px;
+    height: 20px;
+    
+  }
+
+  /* Link Styling */
+.signup-link, .login-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #333;
+  }
+  
+  .signup-link a, .login-link a {
+    color: #ff6b6b; /* Warm red color */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .signup-link a:hover, .login-link a:hover {
+    color: #ff4c4c; /* Darker red on hover */
+  }
+
+  .alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+  .alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+  }
+  .alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+  }
+
+/* Extracted from signup.html */
+/* Add this CSS for the password toggle */
+    .password-toggle {
+      position: relative;
+    }
+    .password-toggle input[type="password"],
+    .password-toggle input[type="text"] {
+      padding-right: 40px; /* Space for the toggle button */
+    }
+    .password-toggle .toggle-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #666;
+    }
+    .password-toggle .toggle-icon:hover {
+      color: #000;
+    }

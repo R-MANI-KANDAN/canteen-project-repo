@@ -1,0 +1,55 @@
+<!-- Description: Menu page displaying various snack items. -->
+{% extends "registration/base.html" %}
+{% load static %}
+
+{% block body_class %}page-snacks{% endblock %}
+
+{% block title %}Snacks – LICET Cafeteria{% endblock %}
+{% block meta_description %}Quick bites and snacks at LICET Cafeteria.{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <h1 class="section-heading">🍿 Snacks</h1>
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;">Quick bites to keep you going!</p>
+
+  {% if products %}
+    {% regroup products by sub_category as category_list %}
+    {% for group in category_list %}
+      {% if group.grouper %}
+        <h2 class="section-heading" style="font-size:1.1rem;">{{ group.grouper|title }}</h2>
+      {% endif %}
+      <div class="product-grid">
+        {% for product in group.list %}
+        <div class="product-card">
+          <img src="{{ product.image.url }}" alt="{{ product.name }}"
+               onerror="this.src='{% static 'images/placeholder.png' %}'">
+          <div class="product-card-body">
+            <div class="product-card-name">{{ product.name|title }}</div>
+            <div class="product-card-footer">
+              <span class="product-price">₹{{ product.price|floatformat:0 }}</span>
+              <button class="add-to-cart-btn"
+                onclick="handleAddToCart(this, {{ product.id }}, '{{ product.name|title }}', {{ product.price }}, '{{ product.image.url }}')">
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:var(--text-muted);padding:2rem 0;">No items available right now. Check back soon!</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function handleAddToCart(btn, id, name, price, img) {
+  addToCart(id, name, price, img);
+  btn.textContent = '✓ Added';
+  btn.classList.add('added');
+  setTimeout(() => { btn.textContent = 'Add'; btn.classList.remove('added'); }, 1500);
+}
+</script>
+{% endblock %}

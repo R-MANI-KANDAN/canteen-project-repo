@@ -1,0 +1,377 @@
+<!-- Description: User homepage displaying menu categories and canteen links. -->
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LICET Cafeteria</title>
+  <link rel="stylesheet" href="{% static 'styles/home.css' %}"> <!-- Link to your CSS file -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <!-- Top Marquee -->
+  <div class="top-marquee">
+    <marquee behavior="scroll" direction="left" scrollamount="8">
+        Welcome to LICET Cafeteria | Fresh Meals Served Hot | Pickup slots for Lunch are available from 12:40 PM to 1:05 PM | Slots will be confirmed and assigned only after billing is completed. Thank you!
+    </marquee>
+    </div>
+  <!-- Hamburger Menu -->
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+    </div>
+
+    <!-- Navigation Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <a href="{% url 'home' %}"><i class="fas fa-home" style="margin-right:10px;"></i>Home</a>
+    <a href="{% url 'ready_to_grab' %}"><i class="fas fa-box-open" style="margin-right:10px;"></i>Ready to Grab</a>
+    <a href="{% url 'cooked_to_serve' %}"><i class="fas fa-fire" style="margin-right:10px;"></i>Cooked to Serve</a>
+    <a href="{% url 'beverages' %}"><i class="fas fa-coffee" style="margin-right:10px;"></i>Beverages</a>
+    <a href="{% url 'snacks' %}"><i class="fas fa-cookie-bite" style="margin-right:10px;"></i>Snacks</a>
+    <a href="{% url 'sidedish' %}"><i class="fas fa-drumstick-bite" style="margin-right:10px;"></i>Side Dishes</a>
+    <a href="{% url 'cart_summary' %}"><i class="fas fa-shopping-cart" style="margin-right:10px;"></i>Cart</a>
+    <a href="{% url 'contact' %}"><i class="fas fa-envelope" style="margin-right:10px;"></i>Contact</a>
+  </nav>
+
+  <!-- Hero Header -->
+  <header class="centered-header">
+    <div style="font-size: 3.5rem; color: #f97316; margin-bottom: 8px; text-shadow: 0 0 40px rgba(249,115,22,0.4);"><i class="fas fa-utensils"></i></div>
+    <h1>LICET Cafeteria</h1>
+    <p style="color: rgba(255,255,255,0.6); font-size: 1.05rem; margin-top: 8px; font-weight: 300;">Fresh food, fast service — skip the queue.</p>
+  </header>
+
+  <!-- Menu Sections -->
+  <main class="centered-content">
+    <!-- Ready-to-Grab Section -->
+    <section class="section ready-to-grab">
+      <h2>🍱 Ready-to-Grab</h2>
+      <p>Grab pre-cooked meals ready to pick.</p>
+      <div class="items">
+        <a href="{% url 'ready_to_grab' %}"><img src="/media/uploads/product/Chicken_Biryani.jpg" alt="Biryani" loading="lazy"></a>
+        <a href="{% url 'ready_to_grab' %}"><img src="/media/uploads/product/Curd_Rice.jpg" alt="Curd Rice" loading="lazy"></a>
+        <a href="{% url 'ready_to_grab' %}"><img src="/media/uploads/product/Veg_Meals.jpg" alt="South Indian Meals" loading="lazy"></a>
+      </div>
+      <a href="{% url 'ready_to_grab' %}" class="button grab-go">Grab & Go →</a>
+    </section>
+
+    <!-- Cooked-to-Serve Section -->
+    <section class="section cooked-to-serve">
+      <h2>🔥 Cooked-to-Serve</h2>
+      <p>Pick up hot & fresh, right on time.</p>
+      <div class="items">
+        <a href="{% url 'cooked_to_serve' %}"><img src="/media/uploads/product/Chicken_Fried_Rice.jpg" alt="Chinese" loading="lazy"></a>
+        <a href="{% url 'cooked_to_serve' %}"><img src="/media/uploads/product/Parotta.jpg" alt="Parotta" loading="lazy"></a>
+        <a href="{% url 'cooked_to_serve' %}"><img src="/media/uploads/product/Chapathi.jpg" alt="Chapathi" loading="lazy"></a>
+      </div>
+      <a href="{% url 'cooked_to_serve' %}" class="button fresh-spot">Fresh on Spot →</a>
+    </section>
+
+    <!-- Beverages Section -->
+    <section class="section beverages">
+      <h2>🥤 Beverages</h2>
+      <p>Quench your thirst with refreshing drinks.</p>
+      <div class="items">
+        <a href="{% url 'beverages' %}"><img src="/media/uploads/product/rose-milk.jpg" alt="Rose Milk" loading="lazy"></a>
+        <a href="{% url 'beverages' %}"><img src="/media/uploads/product/lemon.jpg" alt="Lemon Juice" loading="lazy"></a>
+        <a href="{% url 'beverages' %}"><img src="/media/uploads/product/cavins-milkshake.jpg" alt="Milkshake" loading="lazy"></a>
+      </div>
+      <a href="{% url 'beverages' %}" class="button beverages-btn">Order Now →</a>
+    </section>
+
+    <!-- Snacks Section -->
+    <section class="section snacks">
+      <h2>🍿 Snacks</h2>
+      <p>Enjoy quick bites and snacks.</p>
+      <div class="items">
+        <a href="{% url 'snacks' %}"><img src="/media/uploads/product/samosa.jpg" alt="Samosa" loading="lazy"></a>
+        <a href="{% url 'snacks' %}"><img src="/media/uploads/product/Egg_Podi_Mass.jpg" alt="Egg Podi Mass" loading="lazy"></a>
+        <a href="{% url 'snacks' %}"><img src="/media/uploads/product/french-fries.jpg" alt="French Fries" loading="lazy"></a>
+      </div>
+      <a href="{% url 'snacks' %}" class="button snacks-btn">Order Now →</a>
+    </section>
+
+    <!-- Side Dishes Section -->
+    <section class="section side-dishes">
+      <h2>🍗 Side Dishes</h2>
+      <p>Complement your meal with delicious sides.</p>
+      <div class="items">
+        <a href="{% url 'sidedish' %}"><img src="/media/uploads/product/Chicken_65.jpg" alt="Chicken 65" loading="lazy"></a>
+        <a href="{% url 'sidedish' %}"><img src="/media/uploads/product/Variety_Rice.jpg" alt="Variety Rice" loading="lazy"></a>
+        <a href="{% url 'sidedish' %}"><img src="/media/uploads/product/gobi65.jpg" alt="Gobi 65" loading="lazy"></a>
+      </div>
+      <a href="{% url 'sidedish' %}" class="button side-dishes-btn">Order Now →</a>
+    </section>
+  </main>
+
+  <!-- User Section with Dropdown -->
+  <div class="user-section">
+    <button class="user-button" onclick="toggleDropdown()">
+      <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}" alt="User Profile">
+      <span class="user-info" id="userName">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.email }}{% endif %}</span>
+      <i class="fas fa-chevron-down" style="margin-left: 5px; font-size: 12px;"></i>
+    </button>
+    
+    <!-- Dropdown Menu -->
+    <div class="dropdown-menu" id="dropdownMenu">
+      <div class="dropdown-header">
+        <div>Welcome back!</div>
+      </div>
+      
+      <a href="#" class="dropdown-item" onclick="openProfileModal()">
+        <i class="fas fa-user-edit"></i>
+        <span>Update Profile</span>
+      </a>
+      
+      <div class="dropdown-item points-section">
+        <i class="fas fa-coins"></i>
+        <span>Points: <strong id="userPoints">250</strong></span>
+      </div>
+      
+      <a href= "{% url 'logout' %}" class="dropdown-item logout-section" >
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Profile Update Modal -->
+  <div id="profileModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Update Profile</h2>
+        <button class="close" onclick="closeProfileModal()">&times;</button>
+      </div>
+      
+      <form id="profileForm">
+        <!-- Profile Picture Section -->
+        <div class="profile-pic-section">
+          <div class="profile-pic-container">
+            <img id="profilePicPreview" src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}" alt="Profile Picture" class="profile-pic-preview">
+            <div class="profile-pic-overlay" onclick="document.getElementById('profilePicInput').click()">
+              <i class="fas fa-camera"></i>
+            </div>
+          </div>
+          <div>
+            <input type="file" id="profilePicInput" class="profile-pic-input" accept="image/*" onchange="handleProfilePicChange(event)">
+            <button type="button" class="upload-btn" onclick="document.getElementById('profilePicInput').click()">
+              <i class="fas fa-upload"></i> Choose Photo
+            </button>
+            <button type="button" class="remove-pic-btn" onclick="removeProfilePic()">
+              <i class="fas fa-trash"></i> Remove
+            </button>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" placeholder="Enter your full name">
+        </div>
+        
+        <div class="form-group">
+          <label for="yearOfStudy">Year of Study</label>
+          <select id="yearOfStudy" name="yearOfStudy">
+            <option value="">Select Year</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="batch">Batch</label>
+          <input type="text" id="batch" name="batch" placeholder="e.g., 2021-2025">
+        </div>
+        
+        <div class="form-group">
+          <label for="department">Department</label>
+          <select id="department" name="department">
+            <option value="">Select Department</option>
+            <option value="CSE">CSE</option>
+            <option value="ECE">ECE</option>
+            <option value="IT">IT</option>
+            <option value="EEE">EEE</option>
+            <option value="MECH">MECH</option>
+            <option value="AIDS">AIDS</option>
+          </select>
+        </div>
+        
+
+        
+        <button type="button" class="save-btn" onclick="saveProfile()">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 LICET Cafeteria. All rights reserved.</p>
+    <div class="social-links">
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook fa-lg" style="color:white; margin: 0 10px;"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram fa-lg" style="color:white; margin: 0 10px;"></i></a>
+      <a href="#" aria-label="Twitter"><i class="fab fa-twitter fa-lg" style="color:white; margin: 0 10px;"></i></a>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // Hamburger Menu Toggle
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('active');
+    }
+
+    // User Dropdown Toggle
+    function toggleDropdown() {
+      const dropdown = document.getElementById('dropdownMenu');
+      dropdown.classList.toggle('active');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const userSection = document.querySelector('.user-section');
+      const dropdown = document.getElementById('dropdownMenu');
+      
+      if (!userSection.contains(event.target)) {
+        dropdown.classList.remove('active');
+      }
+    });
+
+    // Profile Modal Functions
+    function openProfileModal() {
+      document.getElementById('profileModal').style.display = 'block';
+      document.getElementById('dropdownMenu').classList.remove('active');
+      
+      // Load existing data if available
+      loadProfileData();
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').style.display = 'none';
+    }
+
+    function loadProfileData() {
+  const userData = JSON.parse(localStorage.getItem('userData')) || {};
+
+  document.getElementById('fullName').value = userData.fullName || '';
+  document.getElementById('yearOfStudy').value = userData.yearOfStudy || '';
+  document.getElementById('batch').value = userData.batch || '';
+  document.getElementById('department').value = userData.department || '';
+
+  // Load profile picture
+  if (userData.profilePic) {
+    document.getElementById('profilePicPreview').src = userData.profilePic;
+    document.querySelector('.user-button img').src = userData.profilePic;
+  }
+
+  if (userData.fullName) {
+    document.getElementById('userName').textContent = userData.fullName;
+  }
+}
+
+
+    function handleProfilePicChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert('Please select a valid image file.');
+          return;
+        }
+        
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Please select an image smaller than 5MB.');
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imageDataUrl = e.target.result;
+          document.getElementById('profilePicPreview').src = imageDataUrl;
+          
+          // Store the image data temporarily
+          window.tempProfilePic = imageDataUrl;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function removeProfilePic() {
+      // Reset to default profile picture
+      const defaultPic = 'Images/Landing Page/User-Logo.png';
+      document.getElementById('profilePicPreview').src = defaultPic;
+      document.getElementById('profilePicInput').value = '';
+      window.tempProfilePic = null;
+    }
+
+    function saveProfile() {
+      const formData = {
+        fullName: document.getElementById('fullName').value,
+        yearOfStudy: document.getElementById('yearOfStudy').value,
+        batch: document.getElementById('batch').value,
+        department: document.getElementById('department').value,
+        profilePic: window.tempProfilePic || window.userData?.profilePic || 'Images/Landing Page/User-Logo.png'
+      };
+
+      // Save to memory (LocalStorage)
+      localStorage.setItem('userData', JSON.stringify(formData));
+
+      
+      // Update the display name
+      if (formData.fullName) {
+        document.getElementById('userName').textContent = formData.fullName;
+      }
+
+      // Update the user button profile picture
+      if (formData.profilePic) {
+        document.querySelector('.user-button img').src = formData.profilePic;
+      }
+
+      // Clear temporary profile pic data
+      window.tempProfilePic = null;
+
+      // Show success message
+      alert('Profile updated successfully!');
+      closeProfileModal();
+    }
+
+    function logout() {
+      const confirmLogout = confirm('Are you sure you want to logout?');
+      if (confirmLogout) {
+        // Clear user data
+        window.userData = {};
+        window.tempProfilePic = null;
+        
+        // In a real app, you would redirect to login page
+        alert('You have been logged out successfully!');
+        
+        // Reset display
+        document.getElementById('userName').textContent = 'User Name';
+        document.querySelector('.user-button img').src = 'Images/Landing Page/User-Logo.png';
+        document.getElementById('dropdownMenu').classList.remove('active');
+      }
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+      const modal = document.getElementById('profileModal');
+      if (event.target === modal) {
+        closeProfileModal();
+      }
+    }
+
+    // Initialize user data storage
+    window.userData = window.userData || {};
+    document.addEventListener('DOMContentLoaded', () => {
+  loadProfileData();
+});
+
+  </script>
+</body>
+</html>

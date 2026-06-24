@@ -1,0 +1,125 @@
+/* Description: Stylesheet specifying table layouts, item counters, and summary card styles for the cart. */
+.cart-page { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; }
+    h2.page-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 1.25rem; }
+
+    /* Cart Table - Translucent */
+    .cart-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; background: rgba(22, 22, 35, 0.4); border-radius: 12px; overflow: hidden; }
+    .cart-table th {
+      text-align: left; padding: .9rem 1rem;
+      font-size: .8rem; color: var(--text-muted); font-weight: 500;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .cart-table td { padding: 1rem; border-bottom: 1px solid var(--border); }
+    .item-cell { display: flex; align-items: center; gap: .75rem; }
+    .item-cell img { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .item-name { font-weight: 600; font-size: .9rem; }
+    .qty-ctrl { display: flex; align-items: center; gap: .4rem; }
+    
+    .qty-btn {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+      color: var(--text); font-size: 1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .qty-btn:hover { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 0 10px var(--brand-glow); }
+    .qty-value { font-weight: 600; min-width: 24px; text-align: center; }
+    .remove-btn {
+      background: transparent; border: none; color: #f87171;
+      cursor: pointer; font-size: .85rem; padding: .25rem;
+      transition: var(--transition);
+    }
+    .remove-btn:hover { color: #ef4444; transform: scale(1.1); }
+    .price-cell { font-weight: 700; color: var(--brand); }
+
+    /* Empty State */
+    .empty-cart {
+      text-align: center; padding: 4rem 1rem; color: var(--text-muted);
+      background: rgba(22, 22, 35, 0.6); backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius);
+    }
+    .empty-cart .icon { font-size: 4rem; margin-bottom: 1rem; animation: bounce 2s infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    /* Summary Box & Cards - Glassmorphism */
+    .summary-box, .section-card {
+      background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+    .summary-row { display: flex; justify-content: space-between; padding: .4rem 0; font-size: .9rem; }
+    .summary-row.total { font-weight: 700; font-size: 1.05rem; border-top: 1px solid var(--border); margin-top: .5rem; padding-top: .75rem; }
+    .coupon-row { display: flex; gap: .5rem; margin-top: .75rem; }
+    .coupon-row input {
+      flex: 1; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); color: var(--text); padding: .45rem .75rem;
+      font-family: inherit; font-size: .875rem; transition: border-color var(--transition);
+    }
+    .coupon-row input:focus { outline: none; border-color: var(--brand); background: rgba(249, 115, 22, 0.05); }
+    .coupon-row button {
+      background: rgba(255, 255, 255, 0.08); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); color: var(--text);
+      padding: .45rem .85rem; cursor: pointer; font-size: .875rem; font-weight: 500;
+      transition: all var(--transition);
+    }
+    .coupon-row button:hover { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 2px 10px var(--brand-glow); }
+
+    /* Slot & Type Cards */
+    .section-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .75rem; display: flex; align-items: center; gap: .4rem; }
+    .option-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .chip {
+      padding: .45rem .95rem; border-radius: 20px;
+      border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted); cursor: pointer; font-size: .85rem; font-weight: 500;
+      transition: all var(--transition);
+    }
+    .chip.active, .chip:hover { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 4px 15px var(--brand-glow); }
+
+    /* Date */
+    input[type="date"].date-input {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); color: var(--text);
+      padding: .5rem .75rem; font-family: inherit; font-size: .875rem;
+      color-scheme: dark; transition: border-color var(--transition);
+    }
+    input[type="date"].date-input:focus { outline: none; border-color: var(--brand); }
+
+    /* Checkout Button */
+    .checkout-btn {
+      width: 100%; padding: .85rem; border: none; border-radius: var(--radius);
+      background: var(--brand); color: #fff;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      transition: all var(--transition); display: flex; align-items: center; justify-content: center; gap: .5rem;
+      box-shadow: 0 4px 20px var(--brand-glow);
+    }
+    .checkout-btn:hover:not(:disabled) { background: var(--brand-dark); transform: translateY(-2px); box-shadow: 0 6px 24px var(--brand-glow); }
+    .checkout-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* Receipt Modal - Glassmorphism */
+    .receipt-modal { display: none; position: fixed; inset: 0; z-index: 600;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; }
+    .receipt-modal.open { display: flex; }
+    .receipt-box {
+      background: rgba(22, 22, 40, 0.95); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px; width: 90%; max-width: 400px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5); padding: 1.5rem;
+      animation: modalUp .3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .receipt-title { font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 1rem; color: #4ade80; }
+    .receipt-row { display: flex; justify-content: space-between; padding: .4rem 0; font-size: .875rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .receipt-row:last-of-type { border-bottom: none; border-top: 1px solid var(--border); margin-top: .5rem; padding-top: .75rem; font-weight: 700; font-size: 1rem; color: var(--brand); }
+    #receiptQR { margin: 1rem auto 0; text-align: center; padding: .5rem; background: #fff; border-radius: 12px; display: inline-block; width: auto; }
+    #receiptQR canvas { display: block; }
+    .receipt-actions { display: flex; gap: .5rem; margin-top: 1.25rem; }
+    .receipt-actions button {
+      flex: 1; padding: .65rem; border-radius: 50px; font-size: .875rem;
+      font-weight: 600; cursor: pointer; transition: all var(--transition); font-family: inherit;
+    }
+    .btn-done { background: var(--brand); color: #fff; border: none; box-shadow: 0 2px 10px var(--brand-glow); }
+    .btn-done:hover { background: var(--brand-dark); transform: translateY(-1px); }
+    .btn-dl { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--glass-border); }
+    .btn-dl:hover { border-color: var(--brand); color: var(--brand); }

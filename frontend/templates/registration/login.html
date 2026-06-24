@@ -1,0 +1,89 @@
+<!-- Description: User login interface for account access. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LICET Cafeteria - Login</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'styles/styles.css' %}"> <!-- Link to your CSS file -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Font Awesome for eye icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+</head>
+<body>
+  <!-- Full-Screen Background -->
+  <div class="fullscreen-bg"></div>
+
+  <!-- Logo and Title -->
+  <div class="logo-container">
+    <div style="font-size: 3rem; color: #f97316; margin-bottom: 10px;"><i class="fas fa-utensils"></i></div>
+    <h1>LICET Cafeteria</h1>
+  </div>
+
+  <!-- Login Form -->
+  <div class="login-container">
+    <form class="login-form" method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <h2>Login</h2>
+
+      <!-- Display error or success messages -->
+      {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+            {% if message.tags == 'success' %}
+              <div class="success-message">
+                {{ message }}
+              </div>
+            {% else %}
+              <div class="alert-error">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Email Input -->
+      <input type="email" name="email" placeholder="Email" required>
+
+      <!-- Password Input with Toggle -->
+      <div class="password-group">
+        <input type="password" name="password" placeholder="Password" required>
+        <i class="fas fa-eye" id="togglePassword"></i>
+      </div>
+
+      <!-- Login Button -->
+      <button type="submit">Login</button>
+
+      <!-- Divider -->
+      <div class="divider">or</div>
+
+      <!-- Google Login Button -->
+      <button class="google-btn" type="button">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
+        Continue with Google
+      </button>
+
+      <!-- Sign Up Link -->
+      <p class="signup-link">Don't have an account? <a href="{% url 'auth' %}">Sign Up</a></p>
+    </form>
+  </div>
+
+  <!-- JavaScript for Password Toggle -->
+  <script>
+    const togglePassword = document.querySelector("#togglePassword");
+    const password = document.querySelector("input[name='password']");
+
+    togglePassword.addEventListener("click", function () {
+      // Toggle password visibility
+      const type = password.getAttribute("type") === "password" ? "text" : "password";
+      password.setAttribute("type", type);
+
+      // Toggle eye icon
+      this.classList.toggle("fa-eye-slash");
+    });
+  </script>
+</body>
+</html>

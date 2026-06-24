@@ -1,0 +1,235 @@
+/* Description: Stylesheet styling the side dishes menu layout. */
+
+    /* Added Hamburger Menu Styles */
+.hamburger-menu {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    cursor: pointer;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.hamburger-menu .bar {
+    width: 25px;
+    height: 3px;
+    background: #2c3e50;
+    margin: 5px 0;
+    transition: 0.4s;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transition: 0.3s;
+    padding-top: 60px;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar a {
+    display: block;
+    padding: 15px 25px;
+    text-decoration: none;
+    color: #2c3e50;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.sidebar a:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+/* Added Beverage Menu Heading */
+.menu-heading {
+    text-align: center;
+    margin: 1rem 0 2rem;
+    color: #2c3e50;
+    font-size: 2.2rem;
+}
+
+:root {
+    --bg-image: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+    --hot-color: #f0b466;
+    --cold-color: #63b952;
+    --healthy-color: #e27168;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.7)), var(--bg-image);
+    background-size: cover;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+.header-logo {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.header-logo img {
+    width: 80px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.header-logo h1 {
+    font-size: 2rem;
+    color: #2c3e50;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.category-section {
+    margin-bottom: 4rem;
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.category-header h2 {
+    font-size: 1.8rem;
+    padding-left: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.scroll-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 2rem;
+    padding-bottom: 1rem;
+    scroll-behavior: smooth;
+}
+
+.beverage-card {
+    min-width: 250px;
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+}
+
+.beverage-card:hover {
+    transform: translateY(-5px);
+}
+
+.beverage-image {
+    width: 100%;
+    height: 180px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-bottom: 1.5rem;
+}
+
+.price-tag {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.order-btn {
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.3s ease;
+}
+
+/* Add this to your existing CSS */
+.user-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 15px;
+    border-radius: 25px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-button img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+}
+
+.user-button:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-2px);
+}
+
+.user-info {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+/* Optional: Add media query for mobile responsiveness */
+@media (max-width: 768px) {
+    .user-button {
+        padding: 6px 12px;
+    }
+    .user-info {
+        display: none; /* Hide text on mobile */
+    }
+    .user-button img {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+.cart-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: rgb(7, 62, 124);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.hot-beverages .category-header h2 { border-left: 5px solid var(--hot-color); color: var(--hot-color); }
+.cold-beverages .category-header h2 { border-left: 5px solid var(--cold-color); color: var(--cold-color); }
+.healthy-choices .category-header h2 { border-left: 5px solid var(--healthy-color); color: var(--healthy-color); }
+
+.hot-beverages .price-tag { color: var(--hot-color); }
+.cold-beverages .price-tag { color: var(--cold-color); }
+.healthy-choices .price-tag { color: var(--healthy-color); }
+
+.hot-beverages .order-btn { background: var(--hot-color); }
+.cold-beverages .order-btn { background: var(--cold-color); }
+.healthy-choices .order-btn { background: var(--healthy-color); }

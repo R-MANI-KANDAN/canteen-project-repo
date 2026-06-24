@@ -1,0 +1,199 @@
+/* Description: Shared login and standard form stylesheet. */
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  justify-content: flex-start; /* Align login form to the left */
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden; /* Prevent scrolling */
+}
+
+/* Full-Screen Background */
+.fullscreen-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../images/fullscreen-bg.jpg'); /* Add your full-screen background image */
+  background-size: cover;
+  background-position: center;
+  z-index: -1; /* Place behind everything */
+}
+
+/* Logo and Title */
+.logo-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 70px; /* Increased logo size */
+  height: auto;
+  filter: brightness(1.2); /* Make the logo more visible */
+}
+
+.logo-container h1 {
+  font-size: 1.8rem; /* Slightly larger text */
+  color: #2c3e50; /* Blue mixed navy color */
+  margin: 0;
+  font-weight: 600; /* Bold text */
+}
+
+/* Login Container */
+.login-container {
+  margin-left: 10%; /* Shift the login form to the left */
+  z-index: 1; /* Place above the background */
+}
+
+/* Login Form */
+.login-form {
+  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 400px; /* Increased width */
+}
+
+.login-form h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #ffc107; /* Warm yellow color */
+}
+
+.login-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #ffc107; /* Warm yellow color */
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-form button:hover {
+  background-color: #e0a800; /* Darker yellow on hover */
+}
+
+/* Divider and Google Button */
+.divider {
+  text-align: center;
+  margin: 20px 0;
+  color: #999;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: #ddd;
+  position: absolute;
+  top: 50%;
+  width: 45%;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.google-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.google-btn:hover {
+  background-color: #f4f4f9;
+}
+
+.google-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Sign Up Link */
+.signup-link {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.signup-link a {
+  color: #ff6b6b; /* Warm red color */
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.signup-link a:hover {
+  color: #ff4c4c; /* Darker red on hover */
+}
+
+/* Extracted from login.html */
+/* Custom CSS for the success message */
+    .success-message {
+      margin-top: 20px; /* Space above the message */
+      padding: 10px;
+      background-color: #d4edda; /* Light green background */
+      color: #155724; /* Dark green text */
+      border: 1px solid #c3e6cb; /* Green border */
+      border-radius: 4px; /* Rounded corners */
+      text-align: center; /* Center the text */
+      font-size: 14px; /* Smaller font size */
+    }
+
+    /* Style for error messages */
+    .alert-error {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f8d7da; /* Light red background */
+      color: #721c24; /* Dark red text */
+      border: 1px solid #f5c6cb; /* Red border */
+      border-radius: 4px;
+      text-align: center;
+      font-size: 14px;
+    }
