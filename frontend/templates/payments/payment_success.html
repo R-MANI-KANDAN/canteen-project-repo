@@ -1,0 +1,144 @@
+<!-- Description: Payment success page with animated checkmark, order details, QR pickup token, and receipt download. -->
+{% extends "registration/base.html" %}
+{% load static %}
+
+{% block title %}Payment Successful – LICET Cafeteria{% endblock %}
+{% block meta_description %}Your payment was successful. Show the QR code at the counter to collect your order.{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'styles/payment_success.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Confetti container -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<div class="success-page">
+
+  <!-- Animated checkmark -->
+  <div class="checkmark-circle"></div>
+
+  <h1 class="success-title">Payment Successful! 🎉</h1>
+  <p class="success-subtitle">Your order is confirmed. Head to the counter at your pickup slot.</p>
+
+  <!-- Pickup Slot Badge -->
+  {% if pickup_slot %}
+  <div class="pickup-badge-lg">
+    🕐 Pickup Slot: <strong>{{ pickup_slot }}</strong>
+  </div>
+  {% endif %}
+
+  <!-- Payment & Order Details -->
+  <div class="success-card">
+    <h3>📋 Order Details</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">Order Ref</span>
+        <span class="detail-value highlight">{{ order_ref }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Status</span>
+        <span class="detail-value success-color">✓ Paid</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Payment ID</span>
+        <span class="detail-value" style="font-size:.8rem;">
+          {{ payment.razorpay_payment_id|default:"—" }}
+        </span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Method</span>
+        <span class="detail-value">{{ payment.get_payment_method_display }}</span>
+      </div>
+      {% if payment.transaction_time %}
+      <div class="detail-item">
+        <span class="detail-label">Date & Time</span>
+        <span class="detail-value">{{ payment.transaction_time|date:"d M Y, g:i A" }}</span>
+      </div>
+      {% endif %}
+      <div class="detail-item">
+        <span class="detail-label">Student</span>
+        <span class="detail-value">
+          {% if payment.user.get_full_name %}{{ payment.user.get_full_name }}{% else %}{{ payment.user.username }}{% endif %}
+        </span>
+      </div>
+    </div>
+
+    <!-- Items summary -->
+    {% if cart_items %}
+    <div class="items-summary">
+      <h4>Items Ordered</h4>
+      {% for item in cart_items %}
+      <div class="item-row">
+        <span class="item-name">{{ item.name }} × {{ item.qty }}</span>
+        <span class="item-subtotal">₹{{ item.subtotal }}</span>
+      </div>
+      {% endfor %}
+      <div class="total-row">
+        <span>Total Paid</span>
+        <span>₹{{ total }}</span>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- QR Pickup Token -->
+  {% if qr_url %}
+  <div class="qr-card">
+    <h3>📱 Show This QR at the Counter</h3>
+    <div class="qr-image-wrapper">
+      <img src="{{ qr_url }}" alt="QR Pickup Token">
+    </div>
+    <p class="qr-instruction">Show this QR code to the cafeteria staff to collect your order.</p>
+  </div>
+  {% endif %}
+
+  <!-- Invoice number if available -->
+  {% if invoice_number %}
+  <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:1.25rem;">
+    Invoice: <strong style="color:var(--brand);">{{ invoice_number }}</strong>
+  </p>
+  {% endif %}
+
+  <!-- Action Buttons -->
+  <div class="success-actions">
+    <a href="{% url 'download_receipt' order_ref=order_ref %}" class="action-btn primary">
+      📥 Download Receipt
+    </a>
+    <a href="{% url 'home' %}" class="action-btn secondary">
+      🏠 Back to Home
+    </a>
+  </div>
+
+</div><!-- end .success-page -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* ── Confetti ─────────────────────────────────────────────────── */
+(function () {
+  const COLORS = ['#f97316','#fb923c','#fbbf24','#34d399','#60a5fa','#a78bfa','#f472b6'];
+  const container = document.getElementById('confettiContainer');
+  const COUNT = 90;
+
+  for (let i = 0; i < COUNT; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const size = Math.random() * 8 + 6;
+    el.style.cssText = `
+      left: ${Math.random() * 100}%;
+      width: ${size}px;
+      height: ${size}px;
+      background: ${COLORS[Math.floor(Math.random() * COLORS.length)]};
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-delay: ${Math.random() * 1.5}s;
+      animation-duration: ${2.5 + Math.random() * 2}s;
+    `;
+    container.appendChild(el);
+  }
+
+  // Remove confetti after 5s
+  setTimeout(() => container.remove(), 6000);
+})();
+</script>
+{% endblock %}

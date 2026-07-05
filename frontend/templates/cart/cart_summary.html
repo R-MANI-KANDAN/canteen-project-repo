@@ -59,8 +59,8 @@
     </div>
 
     <!-- Checkout -->
-    <button class="checkout-btn" id="checkoutBtn" onclick="placeOrder()">
-      ✅ Place Order
+    <button class="checkout-btn" id="checkoutBtn" onclick="goToCheckout()">
+      💳 Proceed to Payment
     </button>
   </div>
 </div>
@@ -187,37 +187,21 @@ function initChips(containerId, onSelect) {
   });
 }
 
-// ── Place Order (POST to Django) ──────────────────────────────────────────────
-function placeOrder() {
-  const btn = document.getElementById('checkoutBtn');
-  btn.disabled = true;
-  btn.textContent = 'Placing Order…';
+// ── Go to Razorpay Checkout ──────────────────────────────────────────────────
+function goToCheckout() {
+  if (!cartItems.length) {
+    alert('Your cart is empty!');
+    return;
+  }
 
-  const date     = document.getElementById('order-date').value;
-  const payload  = {
-    items:       cartItems.map(i => ({ id: i.id, qty: i.qty })),
-    pickup_time: selectedTime,
-    order_type:  selectedType,
-    date:        date,
-  };
+  const date = document.getElementById('order-date').value;
 
-  fetch("{% url 'checkout_order' %}", {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
-    body:    JSON.stringify(payload),
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.status === 'success') {
-      showReceipt(data.order_ref, date);
-      saveCart([]);          // clear cart ONLY after server confirms
-      updateNavCartBadge();
-    } else {
-      alert('Order failed: ' + (data.message || 'Unknown error'));
-    }
-  })
-  .catch(() => alert('Network error – please try again.'))
-  .finally(() => { btn.disabled = false; btn.textContent = '✅ Place Order'; });
+  // Save pickup options to sessionStorage so checkout.js can read them
+  sessionStorage.setItem('checkoutPickupTime', selectedTime);
+  sessionStorage.setItem('checkoutOrderType', selectedType);
+  sessionStorage.setItem('checkoutDate', date);
+
+  window.location.href = "{% url 'payment_checkout' %}";
 }
 
 // ── Receipt ───────────────────────────────────────────────────────────────────

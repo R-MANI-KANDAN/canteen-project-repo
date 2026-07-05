@@ -1,0 +1,277 @@
+/* Description: Payment success page styles with animated checkmark, confetti effect, and QR display. */
+
+/* ── Page Layout ─────────────────────────────────── */
+.success-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  text-align: center;
+}
+
+/* ── Checkmark Animation ─────────────────────────── */
+.checkmark-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(34, 197, 94, 0.3);
+  animation: scaleIn .5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+.checkmark-circle::after {
+  content: '✓';
+  font-size: 3rem;
+  color: #fff;
+  font-weight: 700;
+  animation: checkPop .4s ease .3s both;
+}
+@keyframes scaleIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes checkPop {
+  from { transform: scale(0) rotate(-45deg); opacity: 0; }
+  to { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.success-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #4ade80;
+  margin-bottom: .25rem;
+  animation: fadeUp .5s ease .2s both;
+}
+.success-subtitle {
+  font-size: .95rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  animation: fadeUp .5s ease .35s both;
+}
+@keyframes fadeUp {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ── Details Card ────────────────────────────────── */
+.success-card {
+  background: var(--surface);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  text-align: left;
+  margin-bottom: 1.5rem;
+  animation: fadeUp .5s ease .4s both;
+}
+.success-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  color: var(--text);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .6rem;
+}
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+}
+.detail-label {
+  font-size: .72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  font-weight: 500;
+}
+.detail-value {
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.detail-value.highlight {
+  color: var(--brand);
+}
+.detail-value.success-color {
+  color: #4ade80;
+}
+
+/* ── Items Summary ───────────────────────────────── */
+.items-summary {
+  margin-top: 1rem;
+  padding-top: .75rem;
+  border-top: 1px solid var(--border);
+}
+.items-summary h4 {
+  font-size: .85rem;
+  font-weight: 600;
+  margin-bottom: .5rem;
+  color: var(--text-muted);
+}
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: .3rem 0;
+  font-size: .85rem;
+}
+.item-row .item-name {
+  color: var(--text);
+}
+.item-row .item-subtotal {
+  font-weight: 600;
+  color: var(--brand);
+}
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding-top: .6rem;
+  margin-top: .4rem;
+  border-top: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--brand);
+}
+
+/* ── QR Code Card ────────────────────────────────── */
+.qr-card {
+  background: var(--surface);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+  animation: fadeUp .5s ease .55s both;
+}
+.qr-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: .75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  color: var(--text);
+}
+.qr-image-wrapper {
+  display: inline-block;
+  padding: .75rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+.qr-image-wrapper img {
+  width: 160px;
+  height: 160px;
+  display: block;
+}
+.qr-instruction {
+  margin-top: .75rem;
+  font-size: .8rem;
+  color: var(--text-muted);
+}
+
+/* ── Pickup Slot Badge ───────────────────────────── */
+.pickup-badge-lg {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .65rem 1.25rem;
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  border-radius: 50px;
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--brand);
+  margin-bottom: 1.5rem;
+  animation: fadeUp .5s ease .5s both;
+}
+
+/* ── Action Buttons ──────────────────────────────── */
+.success-actions {
+  display: flex;
+  gap: .75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeUp .5s ease .65s both;
+}
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .65rem 1.25rem;
+  border-radius: 50px;
+  font-size: .875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-decoration: none;
+}
+.action-btn.primary {
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 16px var(--brand-glow);
+}
+.action-btn.primary:hover {
+  background: var(--brand-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px var(--brand-glow);
+}
+.action-btn.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  border: 1px solid var(--glass-border);
+}
+.action-btn.secondary:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* ── Confetti ────────────────────────────────────── */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -10px;
+  opacity: 0;
+  animation: confettiFall 3s ease-out forwards;
+}
+@keyframes confettiFall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 640px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .success-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+}

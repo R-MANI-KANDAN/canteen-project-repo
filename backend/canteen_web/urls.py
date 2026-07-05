@@ -8,7 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('base.urls')),
     path('cart/', include('cart.urls')),
-
+    path('payments/', include('payments.urls')),
 ]
 
 # Only serve static/media files in development

@@ -1,0 +1,112 @@
+/* Description: Extension stylesheet for split-screen login/signup layout, preserving existing colors and input styling. */
+
+/* Reset body for split screen layout */
+body {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Left side GIF panel styling */
+.gif-panel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f7fafc; /* Subtle light background to pop the GIF */
+  border-right: 1px solid #e2e8f0;
+  position: relative;
+}
+
+/* GIF placeholder/image styling */
+.gif-panel img {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Right side content layout adjustments */
+.signup-container, .login-container {
+  width: 50% !important;
+  max-width: 600px !important;
+  min-width: 450px !important;
+  height: 100% !important;
+  margin: 0 !important; /* Override absolute margins from styles.css and styles-signup.css */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  z-index: 10 !important;
+}
+
+.signup-content, .login-content {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+/* Ensure Forms fit perfectly */
+.signup-form, .login-form {
+  width: 100% !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+}
+
+/* Logo positioning */
+.logo-container {
+  position: absolute !important;
+  top: 20px !important;
+  left: 20px !important;
+  z-index: 100 !important;
+}
+
+/* Welcome message text */
+.welcome-message {
+  margin-bottom: 25px;
+}
+
+.welcome-message h2 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+/* Password Toggle Support */
+.password-group {
+  position: relative;
+  width: 100%;
+}
+
+.password-group input {
+  padding-right: 40px !important;
+}
+
+.password-group i.toggle-password {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #718096;
+}
+
+/* Responsive adjustment - fold left side on small displays */
+@media (max-width: 900px) {
+  .gif-panel {
+    display: none !important;
+  }
+  .signup-container, .login-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+  }
+}

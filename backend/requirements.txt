@@ -6,3 +6,7 @@ djangorestframework
 django-allauth
 whitenoise
 gunicorn
+razorpay
+python-dotenv
+qrcode[pil]
+reportlab

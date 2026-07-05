@@ -1,0 +1,174 @@
+<!-- Description: Razorpay-powered checkout page showing order summary, pickup options, and Pay Now button. -->
+{% extends "registration/base.html" %}
+{% load static %}
+
+{% block title %}Checkout – LICET Cafeteria{% endblock %}
+{% block meta_description %}Review your order and complete payment securely via Razorpay.{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'styles/checkout.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="checkout-page">
+  <h2 class="page-title">💳 Checkout</h2>
+
+  <!-- Two-column grid: left = order summary, right = payment panel -->
+  <div class="checkout-grid">
+
+    <!-- ── LEFT: Order Summary + Options ─────────────────────────── -->
+    <div class="checkout-left">
+
+      <!-- Student Info -->
+      <div class="checkout-card" style="margin-bottom:1.25rem;">
+        <h3>🎓 Student Info</h3>
+        <div class="student-info">
+          <div class="info-item">
+            <span class="info-label">Name</span>
+            <span class="info-value">
+              {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.email }}{% endif %}
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email</span>
+            <span class="info-value">{{ user.email }}</span>
+          </div>
+          {% if user.profile.department %}
+          <div class="info-item">
+            <span class="info-label">Department</span>
+            <span class="info-value">{{ user.profile.department }}</span>
+          </div>
+          {% endif %}
+          {% if user.profile.year_of_study %}
+          <div class="info-item">
+            <span class="info-label">Year</span>
+            <span class="info-value">{{ user.profile.year_of_study }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div class="checkout-card" style="margin-bottom:1.25rem;">
+        <h3>🛒 Order Summary</h3>
+        <table class="order-items-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th style="text-align:center;">Qty</th>
+              <th style="text-align:right;">Price</th>
+              <th style="text-align:right;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="checkoutItemsBody">
+            <!-- Populated by checkout.js from localStorage -->
+          </tbody>
+        </table>
+        <div class="pricing-section">
+          <div class="pricing-row">
+            <span>Subtotal</span>
+            <span id="checkoutSubtotal">₹0.00</span>
+          </div>
+          <div class="pricing-row total-row">
+            <span>Total</span>
+            <span id="checkoutTotal" class="price-value">₹0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pickup Options -->
+      <div class="checkout-card">
+        <h3>⏰ Pickup Options</h3>
+
+        <div class="order-options">
+          <!-- Pickup Date -->
+          <div class="option-section">
+            <h4>📅 Date</h4>
+            <input type="date" id="checkoutDate" class="checkout-date-input">
+          </div>
+
+          <!-- Time Slot -->
+          <div class="option-section">
+            <h4>🕐 Pickup Slot</h4>
+            <div class="checkout-chips" id="timeChips">
+              <button class="checkout-chip active" data-value="12:45">12:45 PM</button>
+              <button class="checkout-chip" data-value="13:00">1:00 PM</button>
+              <button class="checkout-chip" data-value="13:15">1:15 PM</button>
+              <button class="checkout-chip" data-value="13:30">1:30 PM</button>
+              <button class="checkout-chip" data-value="14:00">2:00 PM</button>
+            </div>
+          </div>
+
+          <!-- Order Type -->
+          <div class="option-section">
+            <h4>🍽️ Order Type</h4>
+            <div class="checkout-chips" id="typeChips">
+              <button class="checkout-chip active" data-value="Dine In">🍽️ Dine In</button>
+              <button class="checkout-chip" data-value="Takeaway">📦 Takeaway</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: Payment Panel ───────────────────────────────────── -->
+    <div class="checkout-right">
+      <div class="checkout-card" style="position:sticky;top:80px;">
+        <h3>🔒 Secure Payment</h3>
+
+        <!-- Pickup Slot (server-calculated) -->
+        {% if pickup_slot %}
+        <div style="margin-bottom:1rem;">
+          <div class="pickup-badge">
+            🕐 Estimated Pickup: <strong>{{ pickup_slot }}</strong>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Pay Button -->
+        <div class="pay-btn-container">
+          <button class="pay-btn" id="payNowBtn">
+            <span class="btn-label">
+              <span>💳 Pay</span>
+              <span id="payAmountLabel">Now</span>
+            </span>
+            <span class="spinner"></span>
+          </button>
+        </div>
+
+        <!-- Back to Cart -->
+        <a href="{% url 'cart_summary' %}" class="back-btn" style="width:100%;justify-content:center;margin-top:.75rem;">
+          ← Back to Cart
+        </a>
+
+        <!-- Security note -->
+        <div class="security-note">
+          🔐 Payments are secured by Razorpay. We never store your card details.
+        </div>
+
+        <!-- Accepted methods -->
+        <div style="margin-top:1rem;text-align:center;font-size:.75rem;color:var(--text-muted);">
+          Accepts UPI · Cards · Net Banking · Wallets
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .checkout-grid -->
+</div><!-- end .checkout-page -->
+
+<!-- Toast notification -->
+<div class="toast" id="checkoutToast"></div>
+
+<!-- Inject user info for prefill -->
+<script>
+  window.CHECKOUT_USER_NAME  = "{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}";
+  window.CHECKOUT_USER_EMAIL = "{{ user.email }}";
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Razorpay Checkout SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!-- Our integration -->
+<script src="{% static 'js/checkout.js' %}"></script>
+{% endblock %}

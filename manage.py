@@ -6,6 +6,11 @@ import sys
 
 def main():
     """Run administrative tasks."""
+    from pathlib import Path
+    backend_path = Path(__file__).resolve().parent / "backend"
+    if str(backend_path) not in sys.path:
+        sys.path.insert(0, str(backend_path))
+
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'canteen_web.settings')
     try:
         from django.core.management import execute_from_command_line

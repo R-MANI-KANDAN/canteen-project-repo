@@ -1,0 +1,59 @@
+<!-- Description: Payment failed page with animated error icon, error reason display, and retry payment option. -->
+{% extends "registration/base.html" %}
+{% load static %}
+
+{% block title %}Payment Failed – LICET Cafeteria{% endblock %}
+{% block meta_description %}Your payment could not be completed. Please retry or contact support.{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'styles/payment_failed.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="failed-page">
+
+  <!-- Animated error icon -->
+  <div class="error-circle shake"></div>
+
+  <h1 class="failed-title">Payment Failed</h1>
+  <p class="failed-subtitle">Don't worry — your order has not been charged. You can retry below.</p>
+
+  <!-- Error Details -->
+  <div class="failed-card">
+    <h3>⚠️ What Went Wrong</h3>
+    <div class="error-reason">
+      {{ error_reason|default:"The payment could not be completed. This may be due to a declined card, insufficient funds, or a network timeout." }}
+    </div>
+    <div class="order-ref-row">
+      <span>Order Reference</span>
+      <span>{{ order_ref }}</span>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="failed-actions">
+    <!-- Retry button — triggers Razorpay again for same order -->
+    <button class="retry-btn" id="retryBtn"
+            onclick="retryPayment('{{ order_ref }}')">
+      <span class="btn-label">🔄 Retry Payment</span>
+      <span class="spinner"></span>
+    </button>
+
+    <div class="secondary-actions">
+      <a href="{% url 'cart_summary' %}" class="ghost-btn">🛒 Back to Cart</a>
+      <a href="{% url 'contact' %}" class="ghost-btn">📞 Contact Support</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Razorpay SDK needed for retry flow -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  window.CHECKOUT_USER_NAME  = "{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}";
+  window.CHECKOUT_USER_EMAIL = "{{ user.email }}";
+</script>
+<script src="{% static 'js/checkout.js' %}"></script>
+{% endblock %}

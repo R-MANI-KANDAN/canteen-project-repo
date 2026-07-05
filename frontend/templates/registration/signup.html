@@ -1,82 +1,121 @@
-<!-- Description: User signup and registration page. -->
+<!-- Description: User signup and registration page with responsive split-screen layout. -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LICET Cafeteria - Sign Up</title>
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'styles/styles-signup.css' %}"> <!-- Link to your sign-up CSS file -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  
+  <link rel="stylesheet" href="{% static 'styles/styles-signup.css' %}">
+  <link rel="stylesheet" href="{% static 'styles/styles-split.css' %}">
+  <link rel="stylesheet" href="{% static 'styles/styles-auth-modern.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for eye icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
   <!-- Full-Screen Background -->
   <div class="fullscreen-bg"></div>
 
-  <!-- Logo and Title -->
+  <!-- Logo and Title at top left corner -->
   <div class="logo-container">
-    <img src="{% static 'images/logo.png' %}" alt="LICET Cafeteria Logo" class="logo">
+    <img src="{% static 'images/licet_logo.png' %}?v=1" alt="LICET Cafeteria Logo" class="logo">
     <h1>LICET Cafeteria</h1>
   </div>
 
-  <!-- Sign-Up Form -->
-  <div class="signup-container">
-    <form class="signup-form" method="post">
-      {% csrf_token %}
-      <h2>Sign Up</h2>
-
-      <!-- Display error messages -->
-      {% if messages %}
-        <div class="messages">
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-              {{ message }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
-      <!-- Render Django form fields -->
-      {{ form.as_p }}
-
-      <button type="submit">Sign Up</button>
-      <div class="divider">or</div>
-      <button class="google-btn" type="button">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
-        Continue with Google
-      </button>
-      <p class="login-link">Already have an account? <a href="{% url 'login' %}">Login</a></p>
-    </form>
+  <!-- Left Side Animation Panel -->
+  <div class="gif-panel">
+    <!-- PLACEHOLDER FOR SIGNUP PAGE GIF -->
+    <img src="{% static 'images/LICET Sign-up.gif' %}" alt="LICET Animation">
   </div>
 
-  <!-- JavaScript for Password Toggle -->
-  <script>
-    function togglePassword(inputId) {
-      const passwordInput = document.getElementById(inputId);
-      const toggleIcon = passwordInput.nextElementSibling;
+  <!-- Right Side Sign Up Section -->
+  <div class="signup-container">
+    <div class="signup-content">
+      <!-- Welcome Message -->
+      <div class="welcome-message">
+        <h2>Welcome to LICET Cafeteria Pre-Ordering System</h2>
+      </div>
 
-      if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        toggleIcon.textContent = "👁️"; // Change icon to "hide" state
+      <!-- Sign Up Form -->
+      <form class="signup-form" method="post" action="{% url 'auth' %}">
+        {% csrf_token %}
+
+        <div class="auth-header">
+          <h2>Sign-Up</h2>
+          <p>Create your account to start pre-ordering</p>
+        </div>
+
+        <!-- Display error or success messages -->
+        {% if messages %}
+          <div class="messages">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% if form.errors %}
+          <div class="messages">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <div class="alert alert-danger">
+                  <i class="fas fa-exclamation-circle"></i>
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="form-field">
+          <i class="fas fa-user field-icon"></i>
+          <input type="text" name="full_name" placeholder="Full Name" required autocomplete="name">
+        </div>
+
+        <div class="form-field">
+          <i class="fas fa-envelope field-icon"></i>
+          <input type="email" name="email" placeholder="Email address" required autocomplete="email">
+        </div>
+
+        <div class="password-group">
+          <i class="fas fa-lock field-icon"></i>
+          <input type="password" name="password1" id="id_password1" placeholder="Password" required autocomplete="new-password">
+          <i class="fas fa-eye toggle-password" onclick="togglePass('id_password1', this)" role="button" tabindex="0" aria-label="Toggle password visibility" onkeydown="if(event.key==='Enter'||event.key===' ')togglePass('id_password1', this)"></i>
+        </div>
+
+        <div class="password-group">
+          <i class="fas fa-lock field-icon"></i>
+          <input type="password" name="password2" id="id_password2" placeholder="Confirm Password" required autocomplete="new-password">
+          <i class="fas fa-eye toggle-password" onclick="togglePass('id_password2', this)" role="button" tabindex="0" aria-label="Toggle confirm password visibility" onkeydown="if(event.key==='Enter'||event.key===' ')togglePass('id_password2', this)"></i>
+        </div>
+
+        <button type="submit">Sign-Up</button>
+        <div class="divider">or</div>
+        <button class="google-btn" type="button">
+          <img src="{% static 'images/google-logo.svg' %}" alt="Google Logo">
+          Continue with Google
+        </button>
+        <p class="login-link">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function togglePass(inputId, icon) {
+      const input = document.getElementById(inputId);
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
       } else {
-        passwordInput.type = "password";
-        toggleIcon.textContent = "👁️"; // Change icon to "show" state
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
       }
     }
-
-    // Add toggle icons to the password fields rendered by Django
-    document.addEventListener("DOMContentLoaded", function() {
-      const passwordFields = document.querySelectorAll('input[type="password"]');
-      passwordFields.forEach(field => {
-        const toggleIcon = document.createElement("span");
-        toggleIcon.className = "toggle-icon";
-        toggleIcon.textContent = "👁️";
-        toggleIcon.onclick = () => togglePassword(field.id);
-        field.parentNode.classList.add("password-toggle");
-        field.parentNode.appendChild(toggleIcon);
-      });
-    });
   </script>
 </body>
 </html>

@@ -1,9 +1,13 @@
 # Description: Configuration settings for the Django canteen web application.
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-g9-=*ivslm1(nk8(!g+5qcz)ozp&*$v!jn3v)7)(&o*9ehp0xh'
@@ -11,7 +15,7 @@ SECRET_KEY = 'django-insecure-g9-=*ivslm1(nk8(!g+5qcz)ozp&*$v!jn3v)7)(&o*9ehp0xh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok-free.app', '.ngrok.io', 'testserver']
 
 # Application definition
 INSTALLED_APPS = [
@@ -24,6 +28,7 @@ INSTALLED_APPS = [
     'base',  # your custom app
     'django_extensions',  # for extra tools like shell_plus
     'cart',
+    'payments',  # Razorpay payment integration
 ]
 
 MIDDLEWARE = [
@@ -85,7 +90,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'  # IST for correct pickup slot calculations
 USE_I18N = True
 USE_TZ = True
 
@@ -111,3 +116,33 @@ APPEND_SLASH = True
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ─── Razorpay Configuration ───────────────────────────────────────────────────
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', '')
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', '')
+RAZORPAY_WEBHOOK_SECRET = os.environ.get('RAZORPAY_WEBHOOK_SECRET', '')
+
+# ─── Logging ─────────────────────────────────────────────────────────────────
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'payments': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

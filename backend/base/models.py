@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from PIL import Image
 import os
+import uuid
 import datetime
 
 
@@ -54,6 +55,13 @@ class Customer(models.Model):
 
 
 class Order(models.Model):
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+        ('failed', 'Failed'),
+        ('refunded', 'Refunded'),
+    ]
+
     product = models.ForeignKey(Product, on_delete=models.CASCADE)  
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     
@@ -66,6 +74,19 @@ class Order(models.Model):
 
     status = models.BooleanField(default=False)
     date = models.DateField(default=datetime.date.today)
+
+    # ── Payment tracking fields ───────────────────────────────────────────────
+    payment_status = models.CharField(
+        max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending',
+        help_text='Payment status from Razorpay flow'
+    )
+    invoice_number = models.CharField(max_length=30, blank=True, help_text='e.g. LICET-20260626-0001')
+    qr_token = models.UUIDField(default=uuid.uuid4, editable=False, help_text='Unique QR pickup token')
+    pickup_slot = models.CharField(max_length=50, blank=True, help_text='e.g. 1:00 PM - 1:15 PM')
+    grand_total = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0,
+        help_text='Total amount for this order line (price × qty)'
+    )
 
     def __str__(self):
         return f"Order {self.order_id} - {self.product.name} ({self.quantity})"

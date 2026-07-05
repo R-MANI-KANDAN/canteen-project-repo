@@ -1,89 +1,105 @@
-<!-- Description: User login interface for account access. -->
+<!-- Description: User login interface for account access with responsive split-screen layout. -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LICET Cafeteria - Login</title>
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'styles/styles.css' %}"> <!-- Link to your CSS file -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'styles/styles-split.css' %}">
+  <link rel="stylesheet" href="{% static 'styles/styles-auth-modern.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Font Awesome for eye icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  
 </head>
 <body>
   <!-- Full-Screen Background -->
   <div class="fullscreen-bg"></div>
 
-  <!-- Logo and Title -->
+  <!-- Logo and Title at top left corner -->
   <div class="logo-container">
-    <div style="font-size: 3rem; color: #f97316; margin-bottom: 10px;"><i class="fas fa-utensils"></i></div>
+    <img src="{% static 'images/licet_logo.png' %}?v=1" alt="LICET Cafeteria Logo" class="logo">
     <h1>LICET Cafeteria</h1>
   </div>
 
-  <!-- Login Form -->
-  <div class="login-container">
-    <form class="login-form" method="post" action="{% url 'login' %}">
-      {% csrf_token %}
-      <h2>Login</h2>
-
-      <!-- Display error or success messages -->
-      {% if messages %}
-        <div class="messages">
-          {% for message in messages %}
-            {% if message.tags == 'success' %}
-              <div class="success-message">
-                {{ message }}
-              </div>
-            {% else %}
-              <div class="alert-error">
-                {{ message }}
-              </div>
-            {% endif %}
-          {% endfor %}
-        </div>
-      {% endif %}
-
-      <!-- Email Input -->
-      <input type="email" name="email" placeholder="Email" required>
-
-      <!-- Password Input with Toggle -->
-      <div class="password-group">
-        <input type="password" name="password" placeholder="Password" required>
-        <i class="fas fa-eye" id="togglePassword"></i>
-      </div>
-
-      <!-- Login Button -->
-      <button type="submit">Login</button>
-
-      <!-- Divider -->
-      <div class="divider">or</div>
-
-      <!-- Google Login Button -->
-      <button class="google-btn" type="button">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
-        Continue with Google
-      </button>
-
-      <!-- Sign Up Link -->
-      <p class="signup-link">Don't have an account? <a href="{% url 'auth' %}">Sign Up</a></p>
-    </form>
+  <!-- Left Side Animation Panel -->
+  <div class="gif-panel">
+    <!-- PLACEHOLDER FOR LOGIN PAGE GIF -->
+    <img src="{% static 'images/LICET login.gif' %}" alt="LICET Animation">
   </div>
 
-  <!-- JavaScript for Password Toggle -->
+  <!-- Right Side Registration Section -->
+  <div class="login-container">
+    <div class="login-content">
+      <!-- Welcome Message -->
+      <div class="welcome-message">
+        <h2>Welcome to LICET Cafeteria Pre-Ordering System</h2>
+      </div>
+
+      <!-- Registration Form -->
+      <form class="login-form" method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+
+        <div class="auth-header">
+          <h2>Login</h2>
+          <p>Sign in to pre-order from LICET Cafeteria</p>
+        </div>
+
+        <!-- Display error or success messages -->
+        {% if messages %}
+          <div class="messages">
+            {% for message in messages %}
+              {% if message.tags == 'success' %}
+                <div class="alert alert-success">
+                  <i class="fas fa-check-circle"></i>
+                  {{ message }}
+                </div>
+              {% else %}
+                <div class="alert alert-danger">
+                  <i class="fas fa-exclamation-circle"></i>
+                  {{ message }}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="form-field">
+          <i class="fas fa-envelope field-icon"></i>
+          <input type="email" name="email" placeholder="Email address" required autocomplete="email">
+        </div>
+
+        <div class="password-group">
+          <i class="fas fa-lock field-icon"></i>
+          <input type="password" name="password" id="id_password" placeholder="Password" required autocomplete="current-password">
+          <i class="fas fa-eye toggle-password" onclick="togglePass('id_password', this)" role="button" tabindex="0" aria-label="Toggle password visibility" onkeydown="if(event.key==='Enter'||event.key===' ')togglePass('id_password', this)"></i>
+        </div>
+
+        <button type="submit">Login</button>
+        <div class="divider">or</div>
+        <button class="google-btn" type="button">
+          <img src="{% static 'images/google-logo.svg' %}" alt="Google Logo">
+          Continue with Google
+        </button>
+        <p class="signup-link">Don't have an account? <a href="{% url 'auth' %}">Sign-Up</a></p>
+      </form>
+    </div>
+  </div>
+
   <script>
-    const togglePassword = document.querySelector("#togglePassword");
-    const password = document.querySelector("input[name='password']");
-
-    togglePassword.addEventListener("click", function () {
-      // Toggle password visibility
-      const type = password.getAttribute("type") === "password" ? "text" : "password";
-      password.setAttribute("type", type);
-
-      // Toggle eye icon
-      this.classList.toggle("fa-eye-slash");
-    });
+    function togglePass(inputId, icon) {
+      const input = document.getElementById(inputId);
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      }
+    }
   </script>
 </body>
 </html>
