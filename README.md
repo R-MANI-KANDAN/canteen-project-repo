@@ -225,10 +225,3 @@ Access Django Admin Panel at `http://127.0.0.1:8000/admin/`.
 
 ---
 
-## 📜 License & Credits
-
-Developed with ❤️ for **LICET Canteen**.
-
-Designed and Developed by **[R. Mani Kandan](https://github.com/R-MANI-KANDAN)**.
-
-*For queries or contributions, feel free to submit an issue or open a pull request.*
